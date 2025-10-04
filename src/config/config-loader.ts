@@ -69,51 +69,119 @@ export class ConfigLoader {
     }
 
     /**
-     * Create default configuration file
+     * Create default configuration file with environment variable examples
      */
     static createDefaultConfig(configPath: string): void {
-        const configContent = JSON.stringify(this.DEFAULT_CONFIG, null, 2)
+        const configWithComments = {
+            '// AutoDocGen Configuration File':
+                'Edit this file to customize settings',
+            '// Environment Variables':
+                'You can also use environment variables to override these settings',
+            '// Database Environment Variables': [
+                'AUTODOCGEN_DB_TYPE - Database type (default: mongodb)',
+                'AUTODOCGEN_DB_URL - Database connection URL',
+                'AUTODOCGEN_DB_NAME - Database name',
+            ],
+            '// JSON Export Environment Variables': [
+                'AUTODOCGEN_OUTPUT_DIR - Output directory for JSON files',
+                'AUTODOCGEN_FILENAME - Default filename for exports',
+                'AUTODOCGEN_FORMAT - Output format (json or json-pretty)',
+            ],
+            '// Analysis Environment Variables': [
+                'AUTODOCGEN_INCLUDE_PRIVATE - Include private methods (true/false)',
+                'AUTODOCGEN_VERBOSE - Show verbose output (true/false)',
+                'AUTODOCGEN_COLOR_OUTPUT - Enable colored output (true/false)',
+            ],
+            '// Priority':
+                'CLI options > Environment variables > Config file > Defaults',
+            ...this.DEFAULT_CONFIG,
+        }
+
+        const configContent = JSON.stringify(configWithComments, null, 2)
         writeFileSync(configPath, configContent, 'utf8')
     }
 
     /**
-     * Merge user config with defaults
+     * Merge user config with defaults and environment variables
      */
     private static mergeWithDefaults(userConfig: any): AutoDocGenConfig {
         return {
             database: {
                 type:
-                    userConfig.database?.type ||
-                    this.DEFAULT_CONFIG.database.type,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_DB_TYPE',
+                        userConfig.database?.type
+                    ) || this.DEFAULT_CONFIG.database.type,
                 url:
-                    userConfig.database?.url ||
-                    this.DEFAULT_CONFIG.database.url,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_DB_URL',
+                        userConfig.database?.url
+                    ) || this.DEFAULT_CONFIG.database.url,
                 database:
-                    userConfig.database?.database ||
-                    this.DEFAULT_CONFIG.database.database,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_DB_NAME',
+                        userConfig.database?.database
+                    ) || this.DEFAULT_CONFIG.database.database,
             },
             json: {
                 outputDir:
-                    userConfig.json?.outputDir ||
-                    this.DEFAULT_CONFIG.json.outputDir,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_OUTPUT_DIR',
+                        userConfig.json?.outputDir
+                    ) || this.DEFAULT_CONFIG.json.outputDir,
                 filename:
-                    userConfig.json?.filename ||
-                    this.DEFAULT_CONFIG.json.filename,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_FILENAME',
+                        userConfig.json?.filename
+                    ) || this.DEFAULT_CONFIG.json.filename,
                 format:
-                    userConfig.json?.format || this.DEFAULT_CONFIG.json.format,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_FORMAT',
+                        userConfig.json?.format
+                    ) || this.DEFAULT_CONFIG.json.format,
             },
             analysis: {
                 includePrivate:
-                    userConfig.analysis?.includePrivate ??
-                    this.DEFAULT_CONFIG.analysis.includePrivate,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_INCLUDE_PRIVATE',
+                        userConfig.analysis?.includePrivate
+                    ) ?? this.DEFAULT_CONFIG.analysis.includePrivate,
                 verbose:
-                    userConfig.analysis?.verbose ??
-                    this.DEFAULT_CONFIG.analysis.verbose,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_VERBOSE',
+                        userConfig.analysis?.verbose
+                    ) ?? this.DEFAULT_CONFIG.analysis.verbose,
                 colorOutput:
-                    userConfig.analysis?.colorOutput ??
-                    this.DEFAULT_CONFIG.analysis.colorOutput,
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_COLOR_OUTPUT',
+                        userConfig.analysis?.colorOutput
+                    ) ?? this.DEFAULT_CONFIG.analysis.colorOutput,
             },
         }
+    }
+
+    /**
+     * Get value from environment variable or config, with type conversion
+     */
+    private static getEnvOrConfig(envVar: string, configValue: any): any {
+        const envValue = process.env[envVar]
+
+        if (envValue === undefined) {
+            return configValue
+        }
+
+        // Convert string environment variables to appropriate types
+        if (envValue === 'true') return true
+        if (envValue === 'false') return false
+        if (envValue === 'null') return null
+
+        // Try to parse as number
+        const numValue = Number(envValue)
+        if (!isNaN(numValue) && envValue !== '') {
+            return numValue
+        }
+
+        return envValue
     }
 
     /**
