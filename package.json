@@ -12,7 +12,8 @@
         "dev": "tsc --watch",
         "start": "node dist/cli.js",
         "test": "jest",
-        "lint": "eslint src/**/*.ts"
+        "lint": "eslint src/**/*.ts",
+        "postinstall": "node dist/setup.js"
     },
     "keywords": [
         "nestjs",
