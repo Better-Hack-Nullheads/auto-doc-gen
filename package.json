@@ -13,13 +13,9 @@
         "start": "node dist/cli.js",
         "test": "jest",
         "lint": "eslint src/**/*.ts",
-        "postinstall": "node dist/setup.js",
-        "setup": "node dist/setup.js",
-        "docs": "auto-doc-gen export src --output docs.json --format json-pretty",
+        "docs": "auto-doc-gen export src --output docs.json",
         "docs:analyze": "auto-doc-gen analyze src",
-        "docs:info": "auto-doc-gen info src",
-        "docs:export": "auto-doc-gen export src --output docs.json --format json-pretty",
-        "docs:all": "auto-doc-gen export-all src --dir docs"
+        "docs:save": "auto-doc-gen save src --db-url mongodb://localhost:27017/api_docs"
     },
     "keywords": [
         "nestjs",

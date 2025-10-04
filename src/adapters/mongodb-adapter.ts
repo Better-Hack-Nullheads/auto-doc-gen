@@ -1,15 +1,9 @@
 // MongoDB types - will be available after npm install
 const MongoClient = require('mongodb').MongoClient
 type Db = any
-import {
-    DatabaseAdapter,
-    DatabaseConfig,
-    DocumentationEntity,
-    EndpointEntity,
-    TypeSchemaEntity,
-} from '../types/database.types'
+import { DatabaseConfig } from '../types/database.types'
 
-export class MongoDBAdapter implements DatabaseAdapter {
+export class MongoDBAdapter {
     private client: any
     private db: any
     private config: DatabaseConfig
@@ -38,9 +32,6 @@ export class MongoDBAdapter implements DatabaseAdapter {
         await this.db
             .collection(this.config.collections.endpoints)
             .createIndex({ path: 1, method: 1 })
-        await this.db
-            .collection(this.config.collections.endpoints)
-            .createIndex({ documentationId: 1 })
 
         // Create types collection if enabled
         if (this.config.mapping.includeTypeSchemas) {
@@ -48,35 +39,64 @@ export class MongoDBAdapter implements DatabaseAdapter {
             await this.db
                 .collection(this.config.collections.types)
                 .createIndex({ name: 1 })
-            await this.db
-                .collection(this.config.collections.types)
-                .createIndex({ documentationId: 1 })
         }
     }
 
-    async insertDocumentation(doc: DocumentationEntity): Promise<string> {
-        const result = await this.db
+    async saveAnalysis(analysisData: any): Promise<void> {
+        // Create documentation entry
+        const documentation = {
+            title: 'API Documentation',
+            description: 'Auto-generated API documentation',
+            version: '1.0.0',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            analysisData: analysisData,
+        }
+
+        const docResult = await this.db
             .collection(this.config.collections.documentation)
-            .insertOne(doc)
-        return result.insertedId.toString()
-    }
+            .insertOne(documentation)
 
-    async insertEndpoints(endpoints: EndpointEntity[]): Promise<string[]> {
-        if (endpoints.length === 0) return []
+        const docId = docResult.insertedId.toString()
 
-        const result = await this.db
-            .collection(this.config.collections.endpoints)
-            .insertMany(endpoints)
-        return Object.values(result.insertedIds).map((id: any) => id.toString())
-    }
+        // Save controllers as endpoints
+        const endpoints = []
+        for (const controller of analysisData.controllers) {
+            for (const method of controller.methods) {
+                endpoints.push({
+                    path: method.path || '/',
+                    method: method.httpMethod || 'GET',
+                    controllerName: controller.name,
+                    methodName: method.name,
+                    parameters: method.parameters || [],
+                    documentationId: docId,
+                    summary: method.name,
+                    tags: [controller.name],
+                })
+            }
+        }
 
-    async insertTypeSchemas(schemas: TypeSchemaEntity[]): Promise<void> {
-        if (!this.config.mapping.includeTypeSchemas || schemas.length === 0)
-            return
+        if (endpoints.length > 0) {
+            await this.db
+                .collection(this.config.collections.endpoints)
+                .insertMany(endpoints)
+        }
 
-        await this.db
-            .collection(this.config.collections.types)
-            .insertMany(schemas)
+        // Save types if enabled
+        if (this.config.mapping.includeTypeSchemas && analysisData.types) {
+            const typeSchemas = analysisData.types.map((type: any) => ({
+                name: type.name,
+                type: type.type,
+                definition: JSON.stringify(type),
+                documentationId: docId,
+            }))
+
+            if (typeSchemas.length > 0) {
+                await this.db
+                    .collection(this.config.collections.types)
+                    .insertMany(typeSchemas)
+            }
+        }
     }
 
     async close(): Promise<void> {

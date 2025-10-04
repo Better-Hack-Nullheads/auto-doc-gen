@@ -1,25 +1,54 @@
 import { mkdirSync, writeFileSync } from 'fs'
 import { dirname } from 'path'
 import { ControllerInfo } from '../types/controller.types'
-import {
-    ExtractedType,
-    JsonAnalysisResult,
-    JsonOutputOptions,
-} from '../types/json-output.types'
 import { ServiceInfo } from '../types/service.types'
+
+export interface JsonOutputOptions {
+    outputPath: string
+    format: 'json' | 'json-pretty'
+    includeMetadata: boolean
+    timestamp: boolean
+}
+
+export interface ExtractedType {
+    name: string
+    type: 'interface' | 'class' | 'enum' | 'type-alias'
+    filePath: string
+    properties?: any[]
+    methods?: any[]
+}
+
+export interface JsonAnalysisResult {
+    metadata: {
+        generatedAt: string
+        version: string
+        projectPath: string
+        analysisTime: number
+        totalFiles: number
+        totalControllers: number
+        totalServices: number
+        totalMethods: number
+        totalTypes: number
+    }
+    controllers: ControllerInfo[]
+    services: ServiceInfo[]
+    types: ExtractedType[]
+    summary: {
+        controllers: number
+        services: number
+        totalMethods: number
+        totalTypes: number
+        totalDtos: number
+        totalInterfaces: number
+        analysisTime: number
+    }
+}
 
 export class JsonExporter {
     private options: JsonOutputOptions
 
-    constructor(options: JsonOutputOptions = {}) {
-        this.options = {
-            outputPath: './docs/analysis.json',
-            format: 'json-pretty',
-            includeMetadata: true,
-            groupBy: 'none',
-            timestamp: true,
-            ...options,
-        }
+    constructor(options: JsonOutputOptions) {
+        this.options = options
     }
 
     async exportAnalysis(
@@ -36,7 +65,7 @@ export class JsonExporter {
         )
         const jsonString = this.formatJson(result)
         await this.writeToFile(jsonString)
-        return this.options.outputPath!
+        return this.options.outputPath
     }
 
     private buildJsonResult(
@@ -89,7 +118,7 @@ export class JsonExporter {
     }
 
     private async writeToFile(jsonString: string): Promise<void> {
-        const outputPath = this.options.outputPath!
+        const outputPath = this.options.outputPath
         const outputDir = dirname(outputPath)
 
         // Create directory if it doesn't exist

@@ -1,179 +1,130 @@
-# AutoDocGen
+# AutoDocGen - Simple NestJS Analyzer
 
-A simple npm package that automatically analyzes NestJS controllers and services, generating comprehensive documentation with zero configuration.
+A simple CLI tool to analyze NestJS projects and extract controller and service information.
 
 ## Features
 
--   🔍 **Controller Analysis**: Find and analyze all controllers with `@Controller()` decorator
--   🔧 **Service Analysis**: Find and analyze all services with `@Injectable()` decorator
--   📊 **Method Extraction**: Extract method signatures, parameters, return types, and decorators
--   🎨 **Colored Output**: Beautiful, structured console output with colors
--   ⚡ **Fast Analysis**: Quick analysis of NestJS projects
--   📄 **JSON Export**: Export analysis results to JSON format
--   🚀 **Auto Setup**: Automatically adds scripts and creates configuration
+-   **Console Analysis** - Display controllers and services in terminal
+-   **JSON Export** - Save analysis results to JSON file
+-   **Database Save** - Save analysis results to MongoDB
 
-## Quick Start
-
-### 1. Install the package
+## Installation
 
 ```bash
 npm install @auto-doc-gen/core
 ```
 
-### 2. Run setup (adds scripts and creates config)
+## Usage
+
+### 1. Console Analysis
+
+Display controllers and services in the terminal:
 
 ```bash
-npx auto-doc-gen setup
+auto-doc-gen analyze <path>
 ```
 
-### 3. Generate documentation
+Example:
 
 ```bash
-npm run docs
+auto-doc-gen analyze src
 ```
 
-That's it! Your documentation is now available in the `./docs` folder.
+### 2. JSON Export
 
-## Available Commands
-
-After setup, you'll have these commands available:
+Export analysis results to a JSON file:
 
 ```bash
-npm run docs        # Generate documentation
-npm run docs:analyze # Show analysis in console
-npm run docs:info   # Quick summary
-npm run docs:export # Export to JSON file
-npm run docs:all    # Export multiple formats
+auto-doc-gen export <path> --output <file>
 ```
 
-## Manual CLI Usage
-
-If you prefer to use the CLI directly:
+Example:
 
 ```bash
-# Basic analysis
-npx auto-doc-gen analyze ./src
-
-# With options
-npx auto-doc-gen analyze ./src --verbose --no-color
-
-# Quick info
-npx auto-doc-gen info ./src
-
-# Export to JSON
-npx auto-doc-gen export ./src --output docs.json
+auto-doc-gen export src --output docs.json
 ```
 
-### Programmatic Usage
+### 3. Database Save
 
-```typescript
-import { AutoDocGen } from '@auto-doc-gen/core'
-
-const analyzer = new AutoDocGen({ verbose: true })
-await analyzer.analyze('./src')
-```
-
-## Example Output
-
-### Setup Output
+Save analysis results to MongoDB:
 
 ```bash
-🔧 Setting up AutoDocGen...
-✅ Added 5 docs scripts to package.json
-✅ Created autodocgen.config.json with NestJS defaults
-
-🎉 AutoDocGen setup complete!
-
-📋 Available commands:
-   npm run docs        - Generate documentation
-   npm run docs:analyze - Show analysis in console
-   npm run docs:info   - Quick summary
-   npm run docs:export - Export to JSON file
-   npm run docs:all    - Export multiple formats
-
-🔧 Configuration: Edit autodocgen.config.json to customize
-📖 Next step: Run "npm run docs" to generate your first documentation
+auto-doc-gen save <path> --db-url <connection-string>
 ```
 
-### Analysis Output
+Example:
 
 ```bash
-📊 Quick Analysis Results:
-   Controllers: 2
-   Services: 2
-   Analysis time: 4.43s
-
-🎯 Controllers:
-   • AppController (3 methods)
-   • ProductsController (5 methods)
-
-🔧 Services:
-   • AppService (1 methods)
-   • ProductsService (5 methods)
+auto-doc-gen save src --db-url "mongodb://localhost:27017/api_docs"
 ```
 
-### Generated Files
+## Options
 
-After running `npm run docs`, you'll get:
+### Analyze Command
 
--   `./docs/api-documentation.json` - Complete analysis in JSON format
--   `./docs/` folder with organized documentation
+-   `-v, --verbose` - Show verbose output
+-   `--no-color` - Disable colored output
+-   `--include-private` - Include private methods
 
-## Configuration
+### Export Command
 
-The setup creates an `autodocgen.config.json` file with sensible defaults:
+-   `-o, --output <path>` - Output file path (default: ./docs/analysis.json)
+-   `-v, --verbose` - Show verbose output
+
+### Save Command
+
+-   `--db-url <url>` - MongoDB connection URL (required)
+-   `-v, --verbose` - Show verbose output
+
+## NPM Scripts
+
+Add these scripts to your `package.json`:
 
 ```json
 {
-    "sourcePath": "./src",
-    "output": {
-        "json": {
-            "enabled": true,
-            "pretty": true,
-            "outputDir": "./docs",
-            "filename": "api-documentation.json",
-            "includeMetadata": true,
-            "timestamp": true
-        },
-        "console": {
-            "enabled": true,
-            "verbose": false,
-            "colorOutput": true
-        }
-    },
-    "analysis": {
-        "includeInterfaces": true,
-        "includeClasses": true,
-        "includeEnums": true,
-        "includeValidationRules": true,
-        "includeDecorators": true,
-        "includeImports": true,
-        "maxDepth": 5
-    },
-    "include": [
-        "**/*.controller.ts",
-        "**/*.service.ts",
-        "**/*.dto.ts",
-        "**/*.interface.ts",
-        "**/*.enum.ts"
-    ],
-    "exclude": [
-        "**/*.spec.ts",
-        "**/*.test.ts",
-        "**/node_modules/**",
-        "**/dist/**"
-    ]
+    "scripts": {
+        "docs": "auto-doc-gen export src --output docs.json",
+        "docs:analyze": "auto-doc-gen analyze src",
+        "docs:save": "auto-doc-gen save src --db-url mongodb://localhost:27017/api_docs"
+    }
 }
 ```
 
-## CLI Options
+Then run:
 
--   `--verbose`: Show detailed information during analysis
--   `--no-color`: Disable colored output
--   `--include-private`: Include private methods in analysis
--   `--output <path>`: Specify output file path
--   `--format <format>`: Output format (json, json-pretty)
--   `--config <path>`: Use custom config file
+```bash
+npm run docs          # Export to JSON
+npm run docs:analyze  # Show in console
+npm run docs:save     # Save to database
+```
+
+## Output Format
+
+### Console Output
+
+-   Controllers with methods and decorators
+-   Services with methods
+-   Summary statistics
+
+### JSON Output
+
+-   Metadata (generation time, version, etc.)
+-   Controllers array with methods and parameters
+-   Services array with methods
+-   Types array (interfaces, classes, enums)
+-   Summary statistics
+
+### Database Storage
+
+-   Documentation collection with analysis metadata
+-   Endpoints collection with API endpoint details
+-   Types collection with type schemas
+
+## Requirements
+
+-   Node.js >= 16.0.0
+-   TypeScript project with NestJS decorators
+-   MongoDB (for database save feature)
 
 ## License
 
