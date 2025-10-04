@@ -1,41 +1,43 @@
 {
-    "sourcePath": "./src",
-    "output": {
-        "json": {
-            "enabled": true,
-            "pretty": true,
-            "compact": true,
-            "outputDir": "./docs",
-            "filename": "api-documentation.json",
-            "includeMetadata": true,
-            "timestamp": true
+    "database": {
+        "type": "mongodb",
+        "url": "mongodb://localhost:27017/api_docs",
+        "database": "api_docs"
+    },
+    "ai": {
+        "enabled": true,
+        "provider": "google",
+        "model": "gemini-2.5-flash",
+        "temperature": 0.7,
+        "maxTokens": 16000,
+        "outputDir": "./docs",
+        "filename": "ai-analysis.md",
+        "templates": {
+            "default": "comprehensive",
+            "security": "security-focused",
+            "performance": "performance-focused"
         },
-        "console": {
-            "enabled": true,
-            "verbose": false,
-            "colorOutput": true
+        "providers": {
+            "google": {
+                "models": [
+                    "gemini-2.5-flash",
+                    "gemini-2.5-pro",
+                    "gemini-1.5-flash"
+                ],
+                "defaultModel": "gemini-2.5-flash"
+            },
+            "openai": {
+                "models": ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"],
+                "defaultModel": "gpt-4o"
+            },
+            "anthropic": {
+                "models": [
+                    "claude-3-5-sonnet",
+                    "claude-3-haiku",
+                    "claude-3-opus"
+                ],
+                "defaultModel": "claude-3-5-sonnet"
+            }
         }
-    },
-    "analysis": {
-        "includeInterfaces": true,
-        "includeClasses": true,
-        "includeEnums": true,
-        "includeValidationRules": true,
-        "includeDecorators": true,
-        "includeImports": true,
-        "maxDepth": 5
-    },
-    "include": [
-        "**/*.controller.ts",
-        "**/*.service.ts",
-        "**/*.dto.ts",
-        "**/*.interface.ts",
-        "**/*.enum.ts"
-    ],
-    "exclude": [
-        "**/*.spec.ts",
-        "**/*.test.ts",
-        "**/node_modules/**",
-        "**/dist/**"
-    ]
+    }
 }

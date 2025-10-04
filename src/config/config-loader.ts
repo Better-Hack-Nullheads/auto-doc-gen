@@ -41,8 +41,8 @@ export class ConfigLoader {
         },
         ai: {
             enabled: true,
-            provider: 'google',
-            model: 'gemini-2.5-flash',
+            provider: 'openai',
+            model: 'gpt-4o',
             temperature: 0.7,
             maxTokens: 16000,
             outputDir: './docs',

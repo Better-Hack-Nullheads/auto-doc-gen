@@ -1,4 +1,16 @@
-import { JsonAnalysisResult } from '../exporters/json-exporter'
+// Simple interface for analysis data
+interface AnalysisData {
+    controllers?: any[]
+    services?: any[]
+    types?: any[]
+    metadata?: {
+        totalFiles?: number
+        totalControllers?: number
+        totalServices?: number
+        totalMethods?: number
+        totalTypes?: number
+    }
+}
 
 export class PromptTemplates {
     static getDefaultTemplate(): string {
@@ -84,28 +96,38 @@ export class PromptTemplates {
         `
     }
 
-    static buildPrompt(
-        template: string,
-        analysisData: JsonAnalysisResult
-    ): string {
-        const metadata = analysisData.metadata
-        const controllers = JSON.stringify(analysisData.controllers, null, 2)
-        const services = JSON.stringify(analysisData.services, null, 2)
-        const types = JSON.stringify(analysisData.types, null, 2)
+    static buildPrompt(template: string, analysisData: AnalysisData): string {
+        const metadata = analysisData.metadata || {}
+        const controllers = JSON.stringify(
+            analysisData.controllers || [],
+            null,
+            2
+        )
+        const services = JSON.stringify(analysisData.services || [], null, 2)
+        const types = JSON.stringify(analysisData.types || [], null, 2)
         const projectData = JSON.stringify(analysisData, null, 2)
 
         return template
-            .replace(/\{\{totalFiles\}\}/g, metadata.totalFiles.toString())
+            .replace(
+                /\{\{totalFiles\}\}/g,
+                (metadata.totalFiles || 0).toString()
+            )
             .replace(
                 /\{\{totalControllers\}\}/g,
-                metadata.totalControllers.toString()
+                (metadata.totalControllers || 0).toString()
             )
             .replace(
                 /\{\{totalServices\}\}/g,
-                metadata.totalServices.toString()
+                (metadata.totalServices || 0).toString()
             )
-            .replace(/\{\{totalMethods\}\}/g, metadata.totalMethods.toString())
-            .replace(/\{\{totalTypes\}\}/g, metadata.totalTypes.toString())
+            .replace(
+                /\{\{totalMethods\}\}/g,
+                (metadata.totalMethods || 0).toString()
+            )
+            .replace(
+                /\{\{totalTypes\}\}/g,
+                (metadata.totalTypes || 0).toString()
+            )
             .replace(/\{\{controllers\}\}/g, controllers)
             .replace(/\{\{services\}\}/g, services)
             .replace(/\{\{types\}\}/g, types)

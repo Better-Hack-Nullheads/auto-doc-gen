@@ -1,4 +1,5 @@
-// Simplified database configuration for AutoDocGen
+// Database types for AutoDocGen
+
 export interface DatabaseConfig {
     type: 'mongodb'
     connectionString: string
@@ -14,4 +15,18 @@ export interface DatabaseConfig {
         endpoints: string
         types: string
     }
+}
+
+export interface DocumentationRecord {
+    content: string
+    source: string
+    provider: string
+    model: string
+    timestamp: string
+    metadata: {
+        temperature: number
+        maxTokens: number
+    }
+    createdAt: Date
+    updatedAt: Date
 }

@@ -1,29 +1,25 @@
+import { anthropic } from '@ai-sdk/anthropic'
+import { google } from '@ai-sdk/google'
+import { openai } from '@ai-sdk/openai'
 import { generateText } from 'ai'
-import { JsonAnalysisResult } from '../exporters/json-exporter'
-import { AIConfig, AIProvider } from '../types/ai.types'
+import { AIConfig } from '../types/ai.types'
 import { PromptTemplates } from '../utils/prompt-templates'
-import { AnthropicProvider } from './providers/anthropic-provider'
-import { GoogleProvider } from './providers/google-provider'
-import { OpenAIProvider } from './providers/openai-provider'
 
 export class AIService {
-    private provider: AIProvider
-    private model: any
     private config: AIConfig
 
     constructor(config: AIConfig) {
         this.config = config
-        this.provider = this.createProvider(config.provider)
-        this.model = this.provider.createModel(config.model, config.apiKey)
     }
 
-    async analyzeProject(analysisData: JsonAnalysisResult): Promise<string> {
+    async analyzeProject(analysisData: any): Promise<string> {
         const prompt = this.buildPrompt(analysisData)
+        const model = this.createModel()
 
         try {
             console.log('🔍 Sending request to AI...')
             const result = await generateText({
-                model: this.model,
+                model: model as any,
                 prompt,
                 temperature: this.config.temperature || 0.7,
                 maxTokens: this.config.maxTokens || 4000,
@@ -46,20 +42,34 @@ export class AIService {
         }
     }
 
-    private createProvider(providerName: string): AIProvider {
-        switch (providerName) {
+    private createModel() {
+        const { provider, model, apiKey } = this.config
+
+        switch (provider) {
             case 'google':
-                return new GoogleProvider()
+                // Google AI SDK expects GOOGLE_GENERATIVE_AI_API_KEY environment variable
+                if (apiKey) {
+                    process.env.GOOGLE_GENERATIVE_AI_API_KEY = apiKey
+                }
+                return google(model)
             case 'openai':
-                return new OpenAIProvider()
+                // OpenAI SDK expects OPENAI_API_KEY environment variable
+                if (apiKey) {
+                    process.env.OPENAI_API_KEY = apiKey
+                }
+                return openai(model)
             case 'anthropic':
-                return new AnthropicProvider()
+                // Anthropic SDK expects ANTHROPIC_API_KEY environment variable
+                if (apiKey) {
+                    process.env.ANTHROPIC_API_KEY = apiKey
+                }
+                return anthropic(model)
             default:
-                throw new Error(`Unsupported AI provider: ${providerName}`)
+                throw new Error(`Unsupported AI provider: ${provider}`)
         }
     }
 
-    private buildPrompt(analysisData: JsonAnalysisResult): string {
+    private buildPrompt(analysisData: any): string {
         // Use custom prompt if provided in config
         if (this.config.customPrompt) {
             return PromptTemplates.buildPrompt(
@@ -73,10 +83,6 @@ export class AIService {
         return PromptTemplates.buildPrompt(template, analysisData)
     }
 
-    static createFromConfig(config: AIConfig): AIService {
-        return new AIService(config)
-    }
-
     static getAvailableProviders(): string[] {
         return ['google', 'openai', 'anthropic']
     }
@@ -84,11 +90,15 @@ export class AIService {
     static getAvailableModels(provider: string): string[] {
         switch (provider) {
             case 'google':
-                return new GoogleProvider().models
+                return [
+                    'gemini-2.5-flash',
+                    'gemini-2.5-pro',
+                    'gemini-1.5-flash',
+                ]
             case 'openai':
-                return new OpenAIProvider().models
+                return ['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo']
             case 'anthropic':
-                return new AnthropicProvider().models
+                return ['claude-3-5-sonnet', 'claude-3-haiku', 'claude-3-opus']
             default:
                 return []
         }

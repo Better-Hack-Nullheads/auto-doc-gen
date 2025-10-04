@@ -7,10 +7,7 @@ import { existsSync } from 'fs'
 import { join } from 'path'
 import { MongoDBAdapter } from './adapters/mongodb-adapter'
 import { ConfigLoader } from './config/config-loader'
-import { AutoDocGen } from './core/analyzer'
 import { AIService } from './services/ai-service'
-import { SimpleOptions } from './types/common.types'
-import { PromptTemplates } from './utils/prompt-templates'
 
 // Load environment variables from .env file
 config()
@@ -19,10 +16,10 @@ const program = new Command()
 
 program
     .name('auto-doc-gen')
-    .description('Simple NestJS controller and service analyzer')
+    .description('Simple AI-powered documentation generator')
     .version('1.0.0')
 
-// Command 0: Generate Configuration
+// Command 1: Generate Configuration
 program
     .command('config')
     .description('Generate default configuration file')
@@ -45,179 +42,18 @@ program
                 '✅ Created default config file: autodocgen.config.json'
             )
             console.log('📝 Edit autodocgen.config.json to customize settings')
-            console.log('🚀 You can now run: auto-doc-gen analyze src')
+            console.log('🚀 You can now run: auto-doc-gen ai <json-file>')
         } catch (error) {
             console.error('❌ Config generation failed:', error)
             process.exit(1)
         }
     })
 
-// Command 1: Console Analysis
-program
-    .command('analyze')
-    .description(
-        'Analyze NestJS project and display controllers and services in console'
-    )
-    .argument('<path>', 'Path to the NestJS project source directory')
-    .option('-v, --verbose', 'Show verbose output (overrides config)')
-    .option('--no-color', 'Disable colored output (overrides config)')
-    .option('--include-private', 'Include private methods (overrides config)')
-    .action(async (path: string, options: any) => {
-        try {
-            // Load configuration
-            const config = ConfigLoader.loadConfig(path)
-
-            const analyzerOptions: SimpleOptions = {
-                verbose:
-                    options.verbose !== undefined
-                        ? options.verbose
-                        : config.analysis.verbose,
-                colorOutput:
-                    options.color !== undefined
-                        ? options.color
-                        : config.analysis.colorOutput,
-                includePrivate:
-                    options.includePrivate !== undefined
-                        ? options.includePrivate
-                        : config.analysis.includePrivate,
-            }
-
-            const analyzer = new AutoDocGen(analyzerOptions)
-            await analyzer.analyze(path)
-        } catch (error) {
-            console.error('❌ Analysis failed:', error)
-            process.exit(1)
-        }
-    })
-
-// Command 2: JSON Export
-program
-    .command('export')
-    .description('Export analysis results to JSON file')
-    .argument('<path>', 'Path to the NestJS project source directory')
-    .option('-o, --output <path>', 'Output file path (overrides config)')
-    .option('-v, --verbose', 'Show verbose output (overrides config)')
-    .action(async (path: string, options: any) => {
-        try {
-            // Load configuration
-            const config = ConfigLoader.loadConfig(path)
-
-            const analyzer = new AutoDocGen({
-                verbose:
-                    options.verbose !== undefined
-                        ? options.verbose
-                        : config.analysis.verbose,
-                colorOutput: config.analysis.colorOutput,
-            })
-
-            // Use config or override with CLI option
-            const outputPath =
-                options.output ||
-                `${config.json.outputDir}/${config.json.filename}`
-
-            const outputPathResult = await analyzer.exportToJson(path, {
-                outputPath: outputPath,
-                format: config.json.format,
-                includeMetadata: true,
-                timestamp: true,
-            })
-
-            console.log(`✅ JSON exported to: ${outputPathResult}`)
-        } catch (error) {
-            console.error('❌ Export failed:', error)
-            process.exit(1)
-        }
-    })
-
-// Command 3: Database Save
-program
-    .command('save')
-    .description('Save analysis results to MongoDB database')
-    .argument('<path>', 'Path to the NestJS project source directory')
-    .option('--db-url <url>', 'MongoDB connection URL (overrides config)')
-    .option('-v, --verbose', 'Show verbose output (overrides config)')
-    .action(async (path: string, options: any) => {
-        try {
-            // Load configuration
-            const config = ConfigLoader.loadConfig(path)
-
-            // Use config or CLI option for database URL
-            const dbUrl = options.dbUrl || config.database.url
-
-            if (!dbUrl) {
-                console.error('❌ Database URL required!')
-                console.log('💡 Options:')
-                console.log('   1. Add database.url to autodocgen.config.json')
-                console.log(
-                    '   2. Use --db-url option: --db-url "mongodb://localhost:27017/your_db"'
-                )
-                process.exit(1)
-            }
-
-            const analyzer = new AutoDocGen({
-                verbose:
-                    options.verbose !== undefined
-                        ? options.verbose
-                        : config.analysis.verbose,
-                colorOutput: config.analysis.colorOutput,
-            })
-
-            // First export to JSON
-            const tempJsonPath = './temp-analysis.json'
-            await analyzer.exportToJson(path, {
-                outputPath: tempJsonPath,
-                format: 'json',
-                includeMetadata: true,
-                timestamp: true,
-            })
-
-            // Read the JSON data
-            const analysisData = JSON.parse(
-                fs.readFileSync(tempJsonPath, 'utf8')
-            )
-
-            // Create database config
-            const dbConfig = {
-                type: config.database.type,
-                connectionString: dbUrl,
-                database: ConfigLoader.extractDatabaseName(dbUrl),
-                mapping: {
-                    enabled: true,
-                    createCollections: true,
-                    includeTypeSchemas: true,
-                    includeValidationRules: true,
-                },
-                collections: {
-                    documentation: 'documentation',
-                    endpoints: 'endpoints',
-                    types: 'type_schemas',
-                },
-            }
-
-            // Connect to database and save
-            const adapter = new MongoDBAdapter(dbConfig)
-            await adapter.connect()
-            await adapter.createCollections()
-            await adapter.saveAnalysis(analysisData)
-            await adapter.close()
-
-            // Clean up temp file
-            fs.unlinkSync(tempJsonPath)
-
-            console.log('✅ Analysis saved to database')
-        } catch (error) {
-            console.error('❌ Database save failed:', error)
-            process.exit(1)
-        }
-    })
-
-// Command 4: AI Analysis
+// Command 2: AI Analysis (Core Command)
 program
     .command('ai')
-    .description(
-        'Analyze project with AI and generate intelligent documentation'
-    )
-    .argument('<path>', 'Path to the NestJS project source directory')
+    .description('Generate AI documentation from JSON input')
+    .argument('<json-file>', 'Path to JSON file containing project data')
     .option(
         '--provider <provider>',
         'AI provider (google, openai, anthropic)',
@@ -227,18 +63,19 @@ program
     .option('--api-key <key>', 'AI API key (overrides config)')
     .option('--temperature <temp>', 'AI temperature (0.0-1.0)', '0.7')
     .option('--max-tokens <tokens>', 'Maximum tokens for response', '4000')
-    .option(
-        '--template <template>',
-        'Prompt template (default, security, performance)',
-        'default'
-    )
-    .option('--custom-prompt <prompt>', 'Custom prompt template')
     .option('--output <path>', 'Output file path for AI analysis')
+    .option('--save-to-db', 'Save generated documentation to database')
     .option('-v, --verbose', 'Show verbose output')
-    .action(async (path: string, options: any) => {
+    .action(async (jsonFile: string, options: any) => {
         try {
+            // Check if JSON file exists
+            if (!existsSync(jsonFile)) {
+                console.error(`❌ JSON file not found: ${jsonFile}`)
+                process.exit(1)
+            }
+
             // Load configuration
-            const config = ConfigLoader.loadConfig(path)
+            const config = ConfigLoader.loadConfig(process.cwd())
 
             // Check if AI is enabled
             if (!config.ai.enabled) {
@@ -253,7 +90,6 @@ program
             const provider = options.provider || config.ai.provider
             const apiKeyEnvVar = getApiKeyEnvVar(provider)
 
-            // Debug logging
             if (options.verbose) {
                 console.log(`🔍 Debug Info:`)
                 console.log(`   Provider: ${provider}`)
@@ -312,28 +148,8 @@ program
 
             console.log(`🤖 Starting AI analysis with ${provider}/${model}...`)
 
-            // Run analysis
-            const analyzer = new AutoDocGen({
-                verbose:
-                    options.verbose !== undefined
-                        ? options.verbose
-                        : config.analysis.verbose,
-                colorOutput: config.analysis.colorOutput,
-            })
-
-            // First export to JSON
-            const tempJsonPath = './temp-analysis.json'
-            await analyzer.exportToJson(path, {
-                outputPath: tempJsonPath,
-                format: 'json',
-                includeMetadata: true,
-                timestamp: true,
-            })
-
-            // Read the JSON data
-            const analysisData = JSON.parse(
-                fs.readFileSync(tempJsonPath, 'utf8')
-            )
+            // Read JSON data
+            const analysisData = JSON.parse(fs.readFileSync(jsonFile, 'utf8'))
 
             // Create AI service
             const aiConfig = {
@@ -343,21 +159,9 @@ program
                 temperature:
                     parseFloat(options.temperature) || config.ai.temperature,
                 maxTokens: parseInt(options.maxTokens) || config.ai.maxTokens,
-                customPrompt: options.customPrompt,
             }
 
             const aiService = new AIService(aiConfig)
-
-            // Build prompt based on template
-            let prompt: string
-            if (options.customPrompt) {
-                prompt = options.customPrompt
-            } else {
-                const template = PromptTemplates.getTemplate(
-                    options.template || 'default'
-                )
-                prompt = PromptTemplates.buildPrompt(template, analysisData)
-            }
 
             console.log('🧠 Processing with AI...')
             const aiAnalysis = await aiService.analyzeProject(analysisData)
@@ -372,17 +176,75 @@ program
                 fs.mkdirSync(outputDir, { recursive: true })
             }
 
-            // Write AI analysis to file as text
+            // Write AI analysis to file
             fs.writeFileSync(outputPath, aiAnalysis)
-
-            // Clean up temp file
-            fs.unlinkSync(tempJsonPath)
 
             console.log('✅ AI analysis completed!')
             console.log(`📄 Results saved to: ${outputPath}`)
             console.log(
                 `📝 Generated ${aiAnalysis.length} characters of analysis`
             )
+
+            // Save to database if requested
+            if (options.saveToDb) {
+                try {
+                    const dbUrl = config.database.url
+                    if (!dbUrl) {
+                        console.error(
+                            '❌ Database URL required for saving to database!'
+                        )
+                        console.log(
+                            '💡 Add database.url to autodocgen.config.json'
+                        )
+                        return
+                    }
+
+                    const dbConfig = {
+                        type: config.database.type,
+                        connectionString: dbUrl,
+                        database: ConfigLoader.extractDatabaseName(dbUrl),
+                        mapping: {
+                            enabled: true,
+                            createCollections: true,
+                            includeTypeSchemas: true,
+                            includeValidationRules: true,
+                        },
+                        collections: {
+                            documentation: 'documentation',
+                            endpoints: 'endpoints',
+                            types: 'types',
+                        },
+                    }
+
+                    const adapter = new MongoDBAdapter(dbConfig)
+                    await adapter.connect()
+                    await adapter.createCollections()
+
+                    // Save the MD content to database
+                    const docData = {
+                        content: aiAnalysis,
+                        source: jsonFile,
+                        provider: provider,
+                        model: model,
+                        timestamp: new Date().toISOString(),
+                        metadata: {
+                            temperature:
+                                parseFloat(options.temperature) ||
+                                config.ai.temperature,
+                            maxTokens:
+                                parseInt(options.maxTokens) ||
+                                config.ai.maxTokens,
+                        },
+                    }
+
+                    await adapter.saveDocumentation(docData)
+                    await adapter.close()
+
+                    console.log('✅ Documentation saved to database')
+                } catch (dbError) {
+                    console.error('❌ Database save failed:', dbError)
+                }
+            }
         } catch (error) {
             console.error('❌ AI analysis failed:', error)
             process.exit(1)
@@ -392,6 +254,11 @@ program
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
     console.error('❌ Uncaught Exception:', error)
+    process.exit(1)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason)
     process.exit(1)
 })
 
@@ -410,11 +277,6 @@ function getApiKeyEnvVar(provider: string): string {
             return 'GOOGLE_AI_API_KEY'
     }
 }
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason)
-    process.exit(1)
-})
 
 // Parse command line arguments
 program.parse()

@@ -1,130 +1,162 @@
-# AutoDocGen - Simple NestJS Analyzer
+# AutoDocGen - Simple AI Documentation Generator
 
-A simple CLI tool to analyze NestJS projects and extract controller and service information.
+A simple AI-powered documentation generator that takes JSON input and generates markdown documentation using AI.
 
 ## Features
 
--   **Console Analysis** - Display controllers and services in terminal
--   **JSON Export** - Save analysis results to JSON file
--   **Database Save** - Save analysis results to MongoDB
+-   **Core AI Command**: Generate documentation from JSON input using AI
+-   **Config Management**: Create and manage configuration via CLI
+-   **Database Storage**: Save generated documentation to MongoDB
+-   **Multiple AI Providers**: Support for Google, OpenAI, and Anthropic
 
 ## Installation
 
 ```bash
-npm install @auto-doc-gen/core
+npm install -g @auto-doc-gen/core
 ```
 
-## Usage
+## Quick Start
 
-### 1. Console Analysis
-
-Display controllers and services in the terminal:
+### 1. Generate Configuration
 
 ```bash
-auto-doc-gen analyze <path>
+auto-doc-gen config
 ```
 
-Example:
+This creates `autodocgen.config.json` with default settings.
+
+### 2. Set up AI API Key
+
+Set your AI provider API key as an environment variable:
 
 ```bash
-auto-doc-gen analyze src
+# For Google AI
+export GOOGLE_AI_API_KEY="your-api-key"
+
+# For OpenAI
+export OPENAI_API_KEY="your-api-key"
+
+# For Anthropic
+export ANTHROPIC_API_KEY="your-api-key"
 ```
 
-### 2. JSON Export
-
-Export analysis results to a JSON file:
+### 3. Generate Documentation
 
 ```bash
-auto-doc-gen export <path> --output <file>
+# Basic usage
+auto-doc-gen ai input.json
+
+# With custom options
+auto-doc-gen ai input.json --provider openai --model gpt-4o --output docs/my-docs.md
+
+# Save to database
+auto-doc-gen ai input.json --save-to-db
 ```
 
-Example:
+## Commands
 
-```bash
-auto-doc-gen export src --output docs.json
-```
+### `auto-doc-gen config`
 
-### 3. Database Save
+Generate default configuration file.
 
-Save analysis results to MongoDB:
+**Options:**
 
-```bash
-auto-doc-gen save <path> --db-url <connection-string>
-```
+-   `-f, --force` - Overwrite existing config file
 
-Example:
+### `auto-doc-gen ai <json-file>`
 
-```bash
-auto-doc-gen save src --db-url "mongodb://localhost:27017/api_docs"
-```
+Generate AI documentation from JSON input.
 
-## Options
+**Options:**
 
-### Analyze Command
-
+-   `--provider <provider>` - AI provider (google, openai, anthropic)
+-   `--model <model>` - AI model to use
+-   `--api-key <key>` - AI API key (overrides config)
+-   `--temperature <temp>` - AI temperature (0.0-1.0)
+-   `--max-tokens <tokens>` - Maximum tokens for response
+-   `--output <path>` - Output file path for AI analysis
+-   `--save-to-db` - Save generated documentation to database
 -   `-v, --verbose` - Show verbose output
--   `--no-color` - Disable colored output
--   `--include-private` - Include private methods
 
-### Export Command
+## Configuration
 
--   `-o, --output <path>` - Output file path (default: ./docs/analysis.json)
--   `-v, --verbose` - Show verbose output
-
-### Save Command
-
--   `--db-url <url>` - MongoDB connection URL (required)
--   `-v, --verbose` - Show verbose output
-
-## NPM Scripts
-
-Add these scripts to your `package.json`:
+Edit `autodocgen.config.json` to customize settings:
 
 ```json
 {
-    "scripts": {
-        "docs": "auto-doc-gen export src --output docs.json",
-        "docs:analyze": "auto-doc-gen analyze src",
-        "docs:save": "auto-doc-gen save src --db-url mongodb://localhost:27017/api_docs"
+    "database": {
+        "type": "mongodb",
+        "url": "mongodb://localhost:27017/api_docs",
+        "database": "api_docs"
+    },
+    "ai": {
+        "enabled": true,
+        "provider": "google",
+        "model": "gemini-2.5-flash",
+        "temperature": 0.7,
+        "maxTokens": 16000,
+        "outputDir": "./docs",
+        "filename": "ai-analysis.md"
     }
 }
 ```
 
-Then run:
+## Environment Variables
 
-```bash
-npm run docs          # Export to JSON
-npm run docs:analyze  # Show in console
-npm run docs:save     # Save to database
+You can override config settings with environment variables:
+
+-   `GOOGLE_AI_API_KEY` - Google AI API key
+-   `OPENAI_API_KEY` - OpenAI API key
+-   `ANTHROPIC_API_KEY` - Anthropic API key
+-   `AUTODOCGEN_AI_PROVIDER` - AI provider
+-   `AUTODOCGEN_AI_MODEL` - AI model
+-   `AUTODOCGEN_AI_TEMPERATURE` - AI temperature
+-   `AUTODOCGEN_AI_MAX_TOKENS` - Maximum tokens
+
+## Database Storage
+
+When using `--save-to-db`, the generated documentation is saved to MongoDB with the following structure:
+
+```javascript
+{
+    content: "Generated markdown content",
+    source: "input.json",
+    provider: "google",
+    model: "gemini-2.5-flash",
+    timestamp: "2024-01-01T00:00:00.000Z",
+    metadata: {
+        temperature: 0.7,
+        maxTokens: 16000
+    },
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z"
+}
 ```
 
-## Output Format
+## Examples
 
-### Console Output
+### Basic Usage
 
--   Controllers with methods and decorators
--   Services with methods
--   Summary statistics
+```bash
+# Generate config
+auto-doc-gen config
 
-### JSON Output
+# Generate documentation
+auto-doc-gen ai project-data.json
+```
 
--   Metadata (generation time, version, etc.)
--   Controllers array with methods and parameters
--   Services array with methods
--   Types array (interfaces, classes, enums)
--   Summary statistics
+### Advanced Usage
 
-### Database Storage
-
--   Documentation collection with analysis metadata
--   Endpoints collection with API endpoint details
--   Types collection with type schemas
-
-## Requirements
-
--   Node.js >= 16.0.0
--   TypeScript project with NestJS decorators
--   MongoDB (for database save feature)
+```bash
+# Use OpenAI with custom settings
+auto-doc-gen ai project-data.json \
+  --provider openai \
+  --model gpt-4o \
+  --temperature 0.5 \
+  --max-tokens 8000 \
+  --output docs/api-docs.md \
+  --save-to-db
+```
 
 ## License
 

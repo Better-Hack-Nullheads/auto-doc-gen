@@ -99,6 +99,23 @@ export class MongoDBAdapter {
         }
     }
 
+    async saveDocumentation(docData: any): Promise<void> {
+        const documentation = {
+            content: docData.content,
+            source: docData.source,
+            provider: docData.provider,
+            model: docData.model,
+            timestamp: new Date(docData.timestamp),
+            metadata: docData.metadata,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        }
+
+        await this.db
+            .collection(this.config.collections.documentation)
+            .insertOne(documentation)
+    }
+
     async close(): Promise<void> {
         await this.client.close()
     }

@@ -1,20 +1,24 @@
+// Common types for AutoDocGen
+
 export interface SimpleOptions {
-    verbose?: boolean // Show detailed information
-    includePrivate?: boolean // Include private methods
-    colorOutput?: boolean // Use colored console output
+    verbose: boolean
+    colorOutput: boolean
+    includePrivate?: boolean
 }
 
-export interface MethodInfo {
-    name: string
-    parameters: ParameterInfo[]
-    returnType: string
-    decorators: string[]
-    isPublic: boolean
+export interface AnalysisOptions {
+    includeInterfaces?: boolean
+    includeClasses?: boolean
+    includeEnums?: boolean
+    includeValidationRules?: boolean
+    includeDecorators?: boolean
+    includeImports?: boolean
+    maxDepth?: number
 }
 
-export interface ParameterInfo {
-    name: string
-    type: string
-    decorator?: string
-    optional: boolean
+export interface ExportOptions {
+    outputPath: string
+    format: 'json' | 'json-pretty'
+    includeMetadata?: boolean
+    timestamp?: boolean
 }
