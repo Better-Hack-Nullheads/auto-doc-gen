@@ -12,6 +12,13 @@ export { JsonExporter } from './exporters/json-exporter'
 // Database integration
 export { MongoDBAdapter } from './adapters/mongodb-adapter'
 
+// AI integration
+export { AIService } from './services/ai-service'
+export { AnthropicProvider } from './services/providers/anthropic-provider'
+export { GoogleProvider } from './services/providers/google-provider'
+export { OpenAIProvider } from './services/providers/openai-provider'
+export { PromptTemplates } from './utils/prompt-templates'
+
 // Type exports
 export type {
     MethodInfo,
@@ -23,6 +30,14 @@ export type { ServiceInfo } from './types/service.types'
 
 // Database types
 export type { DatabaseConfig } from './types/database.types'
+
+// AI types
+export type {
+    AIAnalysis,
+    AIConfig,
+    AIProvider,
+    AutoDocGenAIConfig,
+} from './types/ai.types'
 
 // Configuration types
 export { ConfigLoader } from './config/config-loader'

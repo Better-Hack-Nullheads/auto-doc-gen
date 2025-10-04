@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs'
 import { join } from 'path'
+import { AutoDocGenAIConfig } from '../types/ai.types'
 
 export interface AutoDocGenConfig {
     database: {
@@ -17,6 +18,7 @@ export interface AutoDocGenConfig {
         verbose: boolean
         colorOutput: boolean
     }
+    ai: AutoDocGenAIConfig
 }
 
 export class ConfigLoader {
@@ -36,6 +38,42 @@ export class ConfigLoader {
             includePrivate: false,
             verbose: false,
             colorOutput: true,
+        },
+        ai: {
+            enabled: true,
+            provider: 'google',
+            model: 'gemini-2.5-flash',
+            temperature: 0.7,
+            maxTokens: 16000,
+            outputDir: './docs',
+            filename: 'ai-analysis.json',
+            templates: {
+                default: 'comprehensive',
+                security: 'security-focused',
+                performance: 'performance-focused',
+            },
+            providers: {
+                google: {
+                    models: [
+                        'gemini-2.5-flash',
+                        'gemini-2.5-pro',
+                        'gemini-1.5-flash',
+                    ],
+                    defaultModel: 'gemini-2.5-flash',
+                },
+                openai: {
+                    models: ['gpt-4o', 'gpt-4o-mini', 'gpt-3.5-turbo'],
+                    defaultModel: 'gpt-4o',
+                },
+                anthropic: {
+                    models: [
+                        'claude-3-5-sonnet',
+                        'claude-3-haiku',
+                        'claude-3-opus',
+                    ],
+                    defaultModel: 'claude-3-5-sonnet',
+                },
+            },
         },
     }
 
@@ -157,6 +195,57 @@ export class ConfigLoader {
                         userConfig.analysis?.colorOutput
                     ) ?? this.DEFAULT_CONFIG.analysis.colorOutput,
             },
+            ai: {
+                enabled:
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_AI_ENABLED',
+                        userConfig.ai?.enabled
+                    ) ?? this.DEFAULT_CONFIG.ai.enabled,
+                provider:
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_AI_PROVIDER',
+                        userConfig.ai?.provider
+                    ) || this.DEFAULT_CONFIG.ai.provider,
+                model:
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_AI_MODEL',
+                        userConfig.ai?.model
+                    ) || this.DEFAULT_CONFIG.ai.model,
+                apiKey:
+                    this.getEnvOrConfig(
+                        this.getApiKeyEnvVar(
+                            userConfig.ai?.provider ||
+                                this.DEFAULT_CONFIG.ai.provider
+                        ),
+                        userConfig.ai?.apiKey
+                    ) || this.DEFAULT_CONFIG.ai.apiKey,
+                temperature:
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_AI_TEMPERATURE',
+                        userConfig.ai?.temperature
+                    ) ?? this.DEFAULT_CONFIG.ai.temperature,
+                maxTokens:
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_AI_MAX_TOKENS',
+                        userConfig.ai?.maxTokens
+                    ) ?? this.DEFAULT_CONFIG.ai.maxTokens,
+                outputDir:
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_AI_OUTPUT_DIR',
+                        userConfig.ai?.outputDir
+                    ) || this.DEFAULT_CONFIG.ai.outputDir,
+                filename:
+                    this.getEnvOrConfig(
+                        'AUTODOCGEN_AI_FILENAME',
+                        userConfig.ai?.filename
+                    ) || this.DEFAULT_CONFIG.ai.filename,
+                templates:
+                    userConfig.ai?.templates ||
+                    this.DEFAULT_CONFIG.ai.templates,
+                providers:
+                    userConfig.ai?.providers ||
+                    this.DEFAULT_CONFIG.ai.providers,
+            },
         }
     }
 
@@ -182,6 +271,22 @@ export class ConfigLoader {
         }
 
         return envValue
+    }
+
+    /**
+     * Get the correct API key environment variable name for the provider
+     */
+    private static getApiKeyEnvVar(provider: string): string {
+        switch (provider) {
+            case 'google':
+                return 'GOOGLE_AI_API_KEY'
+            case 'openai':
+                return 'OPENAI_API_KEY'
+            case 'anthropic':
+                return 'ANTHROPIC_API_KEY'
+            default:
+                return 'GOOGLE_AI_API_KEY'
+        }
     }
 
     /**

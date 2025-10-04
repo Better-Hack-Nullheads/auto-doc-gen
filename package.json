@@ -16,6 +16,7 @@
         "docs": "auto-doc-gen export src",
         "docs:analyze": "auto-doc-gen analyze src",
         "docs:save": "auto-doc-gen save src",
+        "docs:ai": "auto-doc-gen ai src",
         "docs:config": "auto-doc-gen config"
     },
     "keywords": [
@@ -28,10 +29,16 @@
     "author": "Better-Hack-Nullheads",
     "license": "MIT",
     "dependencies": {
+        "@ai-sdk/anthropic": "^1.0.0",
+        "@ai-sdk/google": "^1.0.0",
+        "@ai-sdk/openai": "^1.0.0",
+        "ai": "^3.0.0",
         "chalk": "^4.1.2",
         "commander": "^11.0.0",
+        "dotenv": "^17.2.3",
         "mongodb": "^6.0.0",
-        "ts-morph": "^21.0.1"
+        "ts-morph": "^21.0.1",
+        "zod": "^3.22.0"
     },
     "devDependencies": {
         "@nestjs/common": "^11.1.6",
