@@ -44,3 +44,21 @@ export type {
 
 // NEW: Type extraction types
 export type { TypeExtractionOptions } from './types/type-extraction.types'
+
+// NEW: Database integration
+export { MongoDBAdapter } from './adapters/mongodb-adapter'
+export { DatabaseConfigLoader } from './config/database-config'
+export { DatabaseMapper } from './mappers/database-mapper'
+
+// Database types
+export type {
+    CodeExampleEntity,
+    DatabaseAdapter,
+    DatabaseConfig,
+    DocumentationEntity,
+    EndpointEntity,
+    ParameterEntity,
+    PropertyEntity,
+    TypeSchemaEntity,
+    ValidationRuleEntity,
+} from './types/database.types'

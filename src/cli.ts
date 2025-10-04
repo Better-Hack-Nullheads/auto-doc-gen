@@ -3,8 +3,11 @@
 import { Command } from 'commander'
 import * as fs from 'fs'
 import * as pathModule from 'path'
+import { MongoDBAdapter } from './adapters/mongodb-adapter'
+import { DatabaseConfigLoader } from './config/database-config'
 import { AutoDocGen } from './core/analyzer'
 import { EnhancedJsonExporter } from './exporters/enhanced-json-exporter'
+import { DatabaseMapper } from './mappers/database-mapper'
 import { SimpleOptions } from './types/common.types'
 import { JsonOutputOptions } from './types/json-output.types'
 
@@ -227,6 +230,9 @@ program
         'json-pretty'
     )
     .option('--openapi', 'Also generate OpenAPI specification', false)
+    .option('--database', 'Save analysis to database', false)
+    .option('--db-type <type>', 'Database type: mongodb', 'mongodb')
+    .option('--db-url <url>', 'Database connection URL')
     .option('-v, --verbose', 'Show verbose output', false)
     .action(async (path: string, options: any) => {
         try {
@@ -241,6 +247,45 @@ program
             })
 
             console.log(`✅ Enhanced analysis exported to: ${outputPath}`)
+
+            // Save to database if requested
+            if (options.database) {
+                try {
+                    // Load database config
+                    let dbConfig = DatabaseConfigLoader.loadFromFile(
+                        'autodocgen.config.json'
+                    )
+                    if (!dbConfig) {
+                        dbConfig = DatabaseConfigLoader.createDefaultConfig()
+                    }
+
+                    // Override with CLI options
+                    if (options.dbUrl) {
+                        dbConfig.connectionString = options.dbUrl
+                    }
+                    if (options.dbType) {
+                        dbConfig.type = options.dbType as any
+                    }
+
+                    // Connect to database and save
+                    const adapter = new MongoDBAdapter(dbConfig)
+                    await adapter.connect()
+                    await adapter.createCollections()
+
+                    const mapper = new DatabaseMapper(adapter)
+
+                    // Read the generated analysis file
+                    const analysisData = JSON.parse(
+                        fs.readFileSync(outputPath, 'utf8')
+                    )
+                    await mapper.mapToDatabase(analysisData)
+
+                    await adapter.close()
+                    console.log('✅ Analysis saved to database')
+                } catch (error) {
+                    console.error('❌ Database save failed:', error)
+                }
+            }
 
             if (options.openapi) {
                 // Generate OpenAPI spec from the enhanced analysis
