@@ -124,6 +124,7 @@ autodocgen enhanced ../backend/src --database --db-url "mongodb://localhost:2701
 ```
 
 ### Error Handling
+
 ```bash
 # This will show an error if no database URL is provided
 autodocgen enhanced ../backend/src --database
