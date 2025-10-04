@@ -23,3 +23,7 @@ export type { ServiceInfo } from './types/service.types'
 
 // Database types
 export type { DatabaseConfig } from './types/database.types'
+
+// Configuration types
+export { ConfigLoader } from './config/config-loader'
+export type { AutoDocGenConfig } from './config/config-loader'

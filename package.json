@@ -13,9 +13,9 @@
         "start": "node dist/cli.js",
         "test": "jest",
         "lint": "eslint src/**/*.ts",
-        "docs": "auto-doc-gen export src --output docs.json",
+        "docs": "auto-doc-gen export src",
         "docs:analyze": "auto-doc-gen analyze src",
-        "docs:save": "auto-doc-gen save src --db-url mongodb://localhost:27017/api_docs"
+        "docs:save": "auto-doc-gen save src"
     },
     "keywords": [
         "nestjs",

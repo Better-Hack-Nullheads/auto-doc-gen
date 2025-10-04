@@ -3,25 +3,11 @@
 import { Command } from 'commander'
 import * as fs from 'fs'
 import { MongoDBAdapter } from './adapters/mongodb-adapter'
+import { ConfigLoader } from './config/config-loader'
 import { AutoDocGen } from './core/analyzer'
 import { SimpleOptions } from './types/common.types'
 
 const program = new Command()
-
-/**
- * Extract database name from MongoDB connection string
- */
-function extractDatabaseName(connectionString: string): string {
-    try {
-        const url = new URL(connectionString)
-        const pathname = url.pathname
-        return pathname.startsWith('/')
-            ? pathname.slice(1)
-            : pathname || 'api_docs'
-    } catch {
-        return 'api_docs'
-    }
-}
 
 program
     .name('auto-doc-gen')
@@ -35,15 +21,27 @@ program
         'Analyze NestJS project and display controllers and services in console'
     )
     .argument('<path>', 'Path to the NestJS project source directory')
-    .option('-v, --verbose', 'Show verbose output', false)
-    .option('--no-color', 'Disable colored output', false)
-    .option('--include-private', 'Include private methods', false)
+    .option('-v, --verbose', 'Show verbose output (overrides config)')
+    .option('--no-color', 'Disable colored output (overrides config)')
+    .option('--include-private', 'Include private methods (overrides config)')
     .action(async (path: string, options: any) => {
         try {
+            // Load configuration
+            const config = ConfigLoader.loadConfig(path)
+
             const analyzerOptions: SimpleOptions = {
-                verbose: options.verbose,
-                colorOutput: options.color,
-                includePrivate: options.includePrivate,
+                verbose:
+                    options.verbose !== undefined
+                        ? options.verbose
+                        : config.analysis.verbose,
+                colorOutput:
+                    options.color !== undefined
+                        ? options.color
+                        : config.analysis.colorOutput,
+                includePrivate:
+                    options.includePrivate !== undefined
+                        ? options.includePrivate
+                        : config.analysis.includePrivate,
             }
 
             const analyzer = new AutoDocGen(analyzerOptions)
@@ -59,23 +57,34 @@ program
     .command('export')
     .description('Export analysis results to JSON file')
     .argument('<path>', 'Path to the NestJS project source directory')
-    .option('-o, --output <path>', 'Output file path', './docs/analysis.json')
-    .option('-v, --verbose', 'Show verbose output', false)
+    .option('-o, --output <path>', 'Output file path (overrides config)')
+    .option('-v, --verbose', 'Show verbose output (overrides config)')
     .action(async (path: string, options: any) => {
         try {
+            // Load configuration
+            const config = ConfigLoader.loadConfig(path)
+
             const analyzer = new AutoDocGen({
-                verbose: options.verbose,
-                colorOutput: true,
+                verbose:
+                    options.verbose !== undefined
+                        ? options.verbose
+                        : config.analysis.verbose,
+                colorOutput: config.analysis.colorOutput,
             })
 
-            const outputPath = await analyzer.exportToJson(path, {
-                outputPath: options.output,
-                format: 'json-pretty',
+            // Use config or override with CLI option
+            const outputPath =
+                options.output ||
+                `${config.json.outputDir}/${config.json.filename}`
+
+            const outputPathResult = await analyzer.exportToJson(path, {
+                outputPath: outputPath,
+                format: config.json.format,
                 includeMetadata: true,
                 timestamp: true,
             })
 
-            console.log(`✅ JSON exported to: ${outputPath}`)
+            console.log(`✅ JSON exported to: ${outputPathResult}`)
         } catch (error) {
             console.error('❌ Export failed:', error)
             process.exit(1)
@@ -87,21 +96,32 @@ program
     .command('save')
     .description('Save analysis results to MongoDB database')
     .argument('<path>', 'Path to the NestJS project source directory')
-    .option('--db-url <url>', 'MongoDB connection URL (required)')
-    .option('-v, --verbose', 'Show verbose output', false)
+    .option('--db-url <url>', 'MongoDB connection URL (overrides config)')
+    .option('-v, --verbose', 'Show verbose output (overrides config)')
     .action(async (path: string, options: any) => {
         try {
-            if (!options.dbUrl) {
+            // Load configuration
+            const config = ConfigLoader.loadConfig(path)
+
+            // Use config or CLI option for database URL
+            const dbUrl = options.dbUrl || config.database.url
+
+            if (!dbUrl) {
                 console.error('❌ Database URL required!')
+                console.log('💡 Options:')
+                console.log('   1. Add database.url to autodocgen.config.json')
                 console.log(
-                    '💡 Use --db-url option: --db-url "mongodb://localhost:27017/your_db"'
+                    '   2. Use --db-url option: --db-url "mongodb://localhost:27017/your_db"'
                 )
                 process.exit(1)
             }
 
             const analyzer = new AutoDocGen({
-                verbose: options.verbose,
-                colorOutput: true,
+                verbose:
+                    options.verbose !== undefined
+                        ? options.verbose
+                        : config.analysis.verbose,
+                colorOutput: config.analysis.colorOutput,
             })
 
             // First export to JSON
@@ -120,9 +140,9 @@ program
 
             // Create database config
             const dbConfig = {
-                type: 'mongodb' as const,
-                connectionString: options.dbUrl,
-                database: extractDatabaseName(options.dbUrl),
+                type: config.database.type,
+                connectionString: dbUrl,
+                database: ConfigLoader.extractDatabaseName(dbUrl),
                 mapping: {
                     enabled: true,
                     createCollections: true,
