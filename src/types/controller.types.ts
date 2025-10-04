@@ -1,8 +1,8 @@
-import { MethodInfo } from './common.types';
+import { MethodInfo } from './common.types'
 
 export interface ControllerInfo {
-  name: string;
-  filePath: string;
-  basePath?: string;
-  methods: MethodInfo[];
+    name: string
+    filePath: string
+    basePath?: string
+    methods: MethodInfo[]
 }

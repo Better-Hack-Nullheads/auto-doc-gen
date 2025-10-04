@@ -4,11 +4,11 @@ A simple npm package that reads NestJS controllers and services, then console.lo
 
 ## Features
 
-- 🔍 **Controller Analysis**: Find and analyze all controllers with `@Controller()` decorator
-- 🔧 **Service Analysis**: Find and analyze all services with `@Injectable()` decorator  
-- 📊 **Method Extraction**: Extract method signatures, parameters, return types, and decorators
-- 🎨 **Colored Output**: Beautiful, structured console output with colors
-- ⚡ **Fast Analysis**: Quick analysis of NestJS projects
+-   🔍 **Controller Analysis**: Find and analyze all controllers with `@Controller()` decorator
+-   🔧 **Service Analysis**: Find and analyze all services with `@Injectable()` decorator
+-   📊 **Method Extraction**: Extract method signatures, parameters, return types, and decorators
+-   🎨 **Colored Output**: Beautiful, structured console output with colors
+-   ⚡ **Fast Analysis**: Quick analysis of NestJS projects
 
 ## Installation
 
@@ -51,12 +51,12 @@ await analyzer.analyze('./src')
 
 🎯 UserController (/src/users/user.controller.ts)
    Base Path: /users
-   
+
    Methods:
    ├── GET /users
    │   ├── Parameters: []
    │   └── Return Type: Promise<User[]>
-   
+
    ├── POST /users
    │   ├── Parameters: [body: CreateUserDto]
    │   └── Return Type: Promise<User>
@@ -69,9 +69,9 @@ await analyzer.analyze('./src')
 
 ## Options
 
-- `--verbose`: Show detailed information during analysis
-- `--no-color`: Disable colored output
-- `--include-private`: Include private methods in analysis
+-   `--verbose`: Show detailed information during analysis
+-   `--no-color`: Disable colored output
+-   `--include-private`: Include private methods in analysis
 
 ## License
 
