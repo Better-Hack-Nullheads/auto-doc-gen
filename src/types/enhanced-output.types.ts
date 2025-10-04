@@ -143,22 +143,22 @@ export interface RouteParameter {
 
 // HTTP method mapping
 export const HTTP_METHODS: Record<string, HttpMethodInfo> = {
-    'Get': { method: 'GET', decorator: 'Get' },
-    'Post': { method: 'POST', decorator: 'Post' },
-    'Put': { method: 'PUT', decorator: 'Put' },
-    'Patch': { method: 'PATCH', decorator: 'Patch' },
-    'Delete': { method: 'DELETE', decorator: 'Delete' },
-    'Options': { method: 'OPTIONS', decorator: 'Options' },
-    'Head': { method: 'HEAD', decorator: 'Head' },
-    'All': { method: 'ALL', decorator: 'All' }
+    Get: { method: 'GET', decorator: 'Get' },
+    Post: { method: 'POST', decorator: 'Post' },
+    Put: { method: 'PUT', decorator: 'Put' },
+    Patch: { method: 'PATCH', decorator: 'Patch' },
+    Delete: { method: 'DELETE', decorator: 'Delete' },
+    Options: { method: 'OPTIONS', decorator: 'Options' },
+    Head: { method: 'HEAD', decorator: 'Head' },
+    All: { method: 'ALL', decorator: 'All' },
 }
 
 // Parameter decorator mapping
 export const PARAMETER_DECORATORS: Record<string, string> = {
-    'Body': 'body',
-    'Param': 'path',
-    'Query': 'query',
-    'Headers': 'header',
-    'Req': 'request',
-    'Res': 'response'
+    Body: 'body',
+    Param: 'path',
+    Query: 'query',
+    Headers: 'header',
+    Req: 'request',
+    Res: 'response',
 }

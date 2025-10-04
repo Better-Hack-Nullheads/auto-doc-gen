@@ -1,17 +1,17 @@
 import { Project } from 'ts-morph'
-import { JsonExporter } from '../exporters/json-exporter'
 import { EnhancedJsonExporter } from '../exporters/enhanced-json-exporter'
+import { JsonExporter } from '../exporters/json-exporter'
 import { ControllerExtractor } from '../extractors/controller-extractor'
 import { ServiceExtractor } from '../extractors/service-extractor'
 import { TypeExtractor } from '../extractors/type-extractor'
 import { SimpleOptions } from '../types/common.types'
 import { ControllerInfo } from '../types/controller.types'
+import {
+    EnhancedControllerInfo,
+    TypeSchema,
+} from '../types/enhanced-output.types'
 import { JsonOutputOptions } from '../types/json-output.types'
 import { ServiceInfo } from '../types/service.types'
-import { 
-    EnhancedControllerInfo, 
-    TypeSchema
-} from '../types/enhanced-output.types'
 import { FileUtils } from '../utils/file-utils'
 import { Logger } from './logger'
 import { TypeResolver } from './type-resolver'

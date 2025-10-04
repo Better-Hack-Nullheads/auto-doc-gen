@@ -4,15 +4,15 @@ import {
     Project,
     SourceFile,
 } from 'ts-morph'
-import { MethodInfo, ParameterInfo } from '../types/common.types'
-import { ControllerInfo } from '../types/controller.types'
 import { TypeResolver } from '../core/type-resolver'
 import { SchemaGenerator } from '../generators/schema-generator'
-import { 
-    EnhancedControllerInfo, 
-    EnhancedApiEndpoint, 
-    HTTP_METHODS, 
-    PARAMETER_DECORATORS 
+import { MethodInfo, ParameterInfo } from '../types/common.types'
+import { ControllerInfo } from '../types/controller.types'
+import {
+    EnhancedApiEndpoint,
+    EnhancedControllerInfo,
+    HTTP_METHODS,
+    PARAMETER_DECORATORS,
 } from '../types/enhanced-output.types'
 
 export class ControllerExtractor {
@@ -171,22 +171,30 @@ export class ControllerExtractor {
     /**
      * Extract enhanced controller information with API endpoints
      */
-    extractEnhancedControllerInfo(sourceFile: SourceFile): EnhancedControllerInfo | null {
+    extractEnhancedControllerInfo(
+        sourceFile: SourceFile
+    ): EnhancedControllerInfo | null {
         const classes = sourceFile.getClasses()
 
         for (const classDeclaration of classes) {
             if (this.isController(classDeclaration)) {
                 const basePath = this.extractBasePath(classDeclaration)
-                const endpoints = this.extractApiEndpoints(classDeclaration, basePath, sourceFile)
+                const endpoints = this.extractApiEndpoints(
+                    classDeclaration,
+                    basePath,
+                    sourceFile
+                )
 
                 return {
                     name: classDeclaration.getName() || 'UnknownController',
                     filePath: sourceFile.getFilePath(),
                     basePath,
                     endpoints,
-                    decorators: classDeclaration.getDecorators().map(d => d.getName()),
+                    decorators: classDeclaration
+                        .getDecorators()
+                        .map((d) => d.getName()),
                     imports: this.extractImports(sourceFile),
-                    dependencies: this.extractDependencies(classDeclaration)
+                    dependencies: this.extractDependencies(classDeclaration),
                 }
             }
         }
@@ -198,7 +206,7 @@ export class ControllerExtractor {
      * Extract API endpoints from controller methods
      */
     private extractApiEndpoints(
-        classDeclaration: ClassDeclaration, 
+        classDeclaration: ClassDeclaration,
         basePath: string | undefined,
         sourceFile: SourceFile
     ): EnhancedApiEndpoint[] {
@@ -212,7 +220,12 @@ export class ControllerExtractor {
 
             const httpMethod = this.extractHttpMethod(method)
             if (httpMethod) {
-                const endpoint = this.createApiEndpoint(method, httpMethod, basePath, sourceFile)
+                const endpoint = this.createApiEndpoint(
+                    method,
+                    httpMethod,
+                    basePath,
+                    sourceFile
+                )
                 if (endpoint) {
                     endpoints.push(endpoint)
                 }
@@ -227,7 +240,7 @@ export class ControllerExtractor {
      */
     private extractHttpMethod(method: MethodDeclaration): string | null {
         const decorators = method.getDecorators()
-        
+
         for (const decorator of decorators) {
             const decoratorName = decorator.getName()
             if (HTTP_METHODS[decoratorName]) {
@@ -249,7 +262,7 @@ export class ControllerExtractor {
     ): EnhancedApiEndpoint | null {
         const methodPath = this.extractMethodPath(method)
         const fullPath = this.buildFullPath(basePath, methodPath)
-        
+
         const parameters = this.extractEnhancedParameters(method, sourceFile)
         const requestSchema = this.generateRequestSchema(method, sourceFile)
         const responseSchema = this.generateResponseSchema(method, sourceFile)
@@ -266,7 +279,7 @@ export class ControllerExtractor {
             parameters,
             validationRules: this.extractValidationRules(method),
             examples: [examples],
-            statusCodes: this.generateStatusCodes(httpMethod)
+            statusCodes: this.generateStatusCodes(httpMethod),
         }
     }
 
@@ -275,14 +288,15 @@ export class ControllerExtractor {
      */
     private extractMethodPath(method: MethodDeclaration): string {
         const decorators = method.getDecorators()
-        
+
         for (const decorator of decorators) {
             const decoratorName = decorator.getName()
             if (HTTP_METHODS[decoratorName]) {
                 const args = decorator.getArguments()
                 if (args.length > 0) {
                     const firstArg = args[0]
-                    if (firstArg.getKind() === 10) { // StringLiteral
+                    if (firstArg.getKind() === 10) {
+                        // StringLiteral
                         return firstArg.getText().replace(/['"]/g, '')
                     }
                 }
@@ -296,14 +310,17 @@ export class ControllerExtractor {
     /**
      * Build full path from base path and method path
      */
-    private buildFullPath(basePath: string | undefined, methodPath: string): string {
+    private buildFullPath(
+        basePath: string | undefined,
+        methodPath: string
+    ): string {
         const base = basePath || ''
         const method = methodPath || ''
-        
+
         if (!base && !method) return '/'
         if (!base) return method.startsWith('/') ? method : `/${method}`
         if (!method) return base.startsWith('/') ? base : `/${base}`
-        
+
         const combined = `${base}/${method}`.replace(/\/+/g, '/')
         return combined.startsWith('/') ? combined : `/${combined}`
     }
@@ -311,7 +328,10 @@ export class ControllerExtractor {
     /**
      * Extract enhanced parameters with type resolution
      */
-    private extractEnhancedParameters(method: MethodDeclaration, sourceFile: SourceFile): any[] {
+    private extractEnhancedParameters(
+        method: MethodDeclaration,
+        sourceFile: SourceFile
+    ): any[] {
         const parameters: any[] = []
         const methodParameters = method.getParameters()
 
@@ -321,7 +341,10 @@ export class ControllerExtractor {
             const location = this.getParameterLocation(decoratorNames[0])
 
             const paramType = param.getTypeNode()?.getText() || 'any'
-            const resolvedType = this.typeResolver.resolveType(paramType, sourceFile)
+            const resolvedType = this.typeResolver.resolveType(
+                paramType,
+                sourceFile
+            )
             const schema = this.schemaGenerator.generateSchema(resolvedType)
 
             parameters.push({
@@ -331,7 +354,7 @@ export class ControllerExtractor {
                 required: !param.hasQuestionToken(),
                 description: this.extractJSDocDescription(param),
                 validationRules: this.extractParameterValidationRules(param),
-                schema
+                schema,
             })
         }
 
@@ -341,24 +364,32 @@ export class ControllerExtractor {
     /**
      * Get parameter location from decorator
      */
-    private getParameterLocation(decoratorName: string | undefined): 'path' | 'query' | 'body' | 'header' {
+    private getParameterLocation(
+        decoratorName: string | undefined
+    ): 'path' | 'query' | 'body' | 'header' {
         if (!decoratorName) return 'body'
-        return PARAMETER_DECORATORS[decoratorName] as any || 'body'
+        return (PARAMETER_DECORATORS[decoratorName] as any) || 'body'
     }
 
     /**
      * Generate request schema
      */
-    private generateRequestSchema(method: MethodDeclaration, sourceFile: SourceFile): any {
+    private generateRequestSchema(
+        method: MethodDeclaration,
+        sourceFile: SourceFile
+    ): any {
         const parameters = method.getParameters()
-        
+
         for (const param of parameters) {
             const decorators = param.getDecorators()
             const decoratorNames = decorators.map((d) => d.getName())
-            
+
             if (decoratorNames.includes('Body')) {
                 const paramType = param.getTypeNode()?.getText() || 'any'
-                const resolvedType = this.typeResolver.resolveType(paramType, sourceFile)
+                const resolvedType = this.typeResolver.resolveType(
+                    paramType,
+                    sourceFile
+                )
                 return this.schemaGenerator.generateSchema(resolvedType)
             }
         }
@@ -369,9 +400,15 @@ export class ControllerExtractor {
     /**
      * Generate response schema
      */
-    private generateResponseSchema(method: MethodDeclaration, sourceFile: SourceFile): any {
+    private generateResponseSchema(
+        method: MethodDeclaration,
+        sourceFile: SourceFile
+    ): any {
         const returnType = method.getReturnTypeNode()?.getText() || 'any'
-        const resolvedType = this.typeResolver.resolveType(returnType, sourceFile)
+        const resolvedType = this.typeResolver.resolveType(
+            returnType,
+            sourceFile
+        )
         return this.schemaGenerator.generateSchema(resolvedType)
     }
 
@@ -379,13 +416,19 @@ export class ControllerExtractor {
      * Generate examples
      */
     private generateExamples(requestSchema?: any, responseSchema?: any): any {
-        return this.schemaGenerator.generateExamples(requestSchema, responseSchema)
+        return this.schemaGenerator.generateExamples(
+            requestSchema,
+            responseSchema
+        )
     }
 
     /**
      * Generate method summary
      */
-    private generateMethodSummary(methodName: string, httpMethod: string): string {
+    private generateMethodSummary(
+        methodName: string,
+        httpMethod: string
+    ): string {
         const action = this.getActionFromMethodName(methodName)
         return `${action} ${httpMethod} endpoint`
     }
@@ -395,12 +438,12 @@ export class ControllerExtractor {
      */
     private getActionFromMethodName(methodName: string): string {
         const actionMap: Record<string, string> = {
-            'create': 'Create',
-            'findAll': 'Get all',
-            'findOne': 'Get',
-            'update': 'Update',
-            'remove': 'Delete',
-            'delete': 'Delete'
+            create: 'Create',
+            findAll: 'Get all',
+            findOne: 'Get',
+            update: 'Update',
+            remove: 'Delete',
+            delete: 'Delete',
         }
 
         for (const [key, value] of Object.entries(actionMap)) {
@@ -435,29 +478,31 @@ export class ControllerExtractor {
      */
     private generateStatusCodes(httpMethod: string): any[] {
         const statusCodeMap: Record<string, any[]> = {
-            'GET': [
+            GET: [
                 { code: 200, description: 'Success' },
-                { code: 404, description: 'Not found' }
+                { code: 404, description: 'Not found' },
             ],
-            'POST': [
+            POST: [
                 { code: 201, description: 'Created' },
-                { code: 400, description: 'Bad request' }
+                { code: 400, description: 'Bad request' },
             ],
-            'PUT': [
+            PUT: [
                 { code: 200, description: 'Success' },
-                { code: 404, description: 'Not found' }
+                { code: 404, description: 'Not found' },
             ],
-            'PATCH': [
+            PATCH: [
                 { code: 200, description: 'Success' },
-                { code: 404, description: 'Not found' }
+                { code: 404, description: 'Not found' },
             ],
-            'DELETE': [
+            DELETE: [
                 { code: 200, description: 'Success' },
-                { code: 404, description: 'Not found' }
-            ]
+                { code: 404, description: 'Not found' },
+            ],
         }
 
-        return statusCodeMap[httpMethod] || [{ code: 200, description: 'Success' }]
+        return (
+            statusCodeMap[httpMethod] || [{ code: 200, description: 'Success' }]
+        )
     }
 
     /**
@@ -492,7 +537,7 @@ export class ControllerExtractor {
                     name: defaultImport.getText(),
                     from: moduleSpecifier,
                     isDefault: true,
-                    isNamespace: false
+                    isNamespace: false,
                 })
             }
 
@@ -501,7 +546,7 @@ export class ControllerExtractor {
                     name: namedImport.getName(),
                     from: moduleSpecifier,
                     isDefault: false,
-                    isNamespace: false
+                    isNamespace: false,
                 })
             }
         }

@@ -3,8 +3,8 @@ import {
     InterfaceDeclaration,
     Project,
     SourceFile,
-    TypeNode,
     Type,
+    TypeNode,
 } from 'ts-morph'
 
 export interface ResolvedType {
@@ -53,7 +53,7 @@ export class TypeResolver {
 
         // Clean type name (remove generics, arrays, etc.)
         const cleanTypeName = this.cleanTypeName(typeName)
-        
+
         // Handle primitive types
         if (this.isPrimitiveType(cleanTypeName)) {
             const resolved = this.createPrimitiveType(cleanTypeName)
@@ -113,8 +113,18 @@ export class TypeResolver {
      */
     private isPrimitiveType(typeName: string): boolean {
         const primitives = [
-            'string', 'number', 'boolean', 'any', 'void', 'null', 'undefined',
-            'Date', 'Array', 'Object', 'Function', 'Promise'
+            'string',
+            'number',
+            'boolean',
+            'any',
+            'void',
+            'null',
+            'undefined',
+            'Date',
+            'Array',
+            'Object',
+            'Function',
+            'Promise',
         ]
         return primitives.includes(typeName)
     }
@@ -126,42 +136,53 @@ export class TypeResolver {
         return {
             name: typeName,
             type: 'primitive',
-            description: `Primitive type: ${typeName}`
+            description: `Primitive type: ${typeName}`,
         }
     }
 
     /**
      * Create array type
      */
-    private createArrayType(elementTypeName: string, sourceFile?: SourceFile): ResolvedType {
+    private createArrayType(
+        elementTypeName: string,
+        sourceFile?: SourceFile
+    ): ResolvedType {
         const elementType = this.resolveType(elementTypeName, sourceFile)
         return {
             name: `${elementTypeName}[]`,
             type: 'array',
             items: elementType,
-            description: `Array of ${elementTypeName}`
+            description: `Array of ${elementTypeName}`,
         }
     }
 
     /**
      * Create union type
      */
-    private createUnionType(unionTypeName: string, sourceFile?: SourceFile): ResolvedType {
-        const types = unionTypeName.split(' | ').map(t => t.trim())
-        const unionTypes = types.map(type => this.resolveType(type, sourceFile))
-        
+    private createUnionType(
+        unionTypeName: string,
+        sourceFile?: SourceFile
+    ): ResolvedType {
+        const types = unionTypeName.split(' | ').map((t) => t.trim())
+        const unionTypes = types.map((type) =>
+            this.resolveType(type, sourceFile)
+        )
+
         return {
             name: unionTypeName,
             type: 'union',
             unionTypes,
-            description: `Union type: ${unionTypeName}`
+            description: `Union type: ${unionTypeName}`,
         }
     }
 
     /**
      * Find type definition in source files
      */
-    private findTypeDefinition(typeName: string, sourceFile?: SourceFile): ResolvedType {
+    private findTypeDefinition(
+        typeName: string,
+        sourceFile?: SourceFile
+    ): ResolvedType {
         // Search in provided source file first
         if (sourceFile) {
             const found = this.searchInSourceFile(typeName, sourceFile)
@@ -178,14 +199,17 @@ export class TypeResolver {
         return {
             name: typeName,
             type: 'primitive',
-            description: `Unknown type: ${typeName}`
+            description: `Unknown type: ${typeName}`,
         }
     }
 
     /**
      * Search for type in a specific source file
      */
-    private searchInSourceFile(typeName: string, sourceFile: SourceFile): ResolvedType | null {
+    private searchInSourceFile(
+        typeName: string,
+        sourceFile: SourceFile
+    ): ResolvedType | null {
         // Search interfaces
         const interfaces = sourceFile.getInterfaces()
         for (const interfaceDecl of interfaces) {
@@ -216,17 +240,22 @@ export class TypeResolver {
     /**
      * Resolve interface declaration
      */
-    private resolveInterface(interfaceDecl: InterfaceDeclaration, sourceFile: SourceFile): ResolvedType {
+    private resolveInterface(
+        interfaceDecl: InterfaceDeclaration,
+        sourceFile: SourceFile
+    ): ResolvedType {
         const properties: PropertyInfo[] = []
-        
+
         for (const property of interfaceDecl.getProperties()) {
             const typeNode = property.getTypeNode()
-            const propertyType = typeNode ? this.resolveTypeNode(typeNode, sourceFile) : this.createPrimitiveType('any')
+            const propertyType = typeNode
+                ? this.resolveTypeNode(typeNode, sourceFile)
+                : this.createPrimitiveType('any')
             properties.push({
                 name: property.getName(),
                 type: propertyType,
                 optional: property.hasQuestionToken(),
-                description: this.extractJSDocDescription(property)
+                description: this.extractJSDocDescription(property),
             })
         }
 
@@ -235,25 +264,30 @@ export class TypeResolver {
             type: 'interface',
             properties,
             filePath: sourceFile.getFilePath(),
-            description: this.extractJSDocDescription(interfaceDecl)
+            description: this.extractJSDocDescription(interfaceDecl),
         }
     }
 
     /**
      * Resolve class declaration
      */
-    private resolveClass(classDecl: ClassDeclaration, sourceFile: SourceFile): ResolvedType {
+    private resolveClass(
+        classDecl: ClassDeclaration,
+        sourceFile: SourceFile
+    ): ResolvedType {
         const properties: PropertyInfo[] = []
-        
+
         for (const property of classDecl.getProperties()) {
             const typeNode = property.getTypeNode()
-            const propertyType = typeNode ? this.resolveTypeNode(typeNode, sourceFile) : this.createPrimitiveType('any')
+            const propertyType = typeNode
+                ? this.resolveTypeNode(typeNode, sourceFile)
+                : this.createPrimitiveType('any')
             properties.push({
                 name: property.getName(),
                 type: propertyType,
                 optional: property.hasQuestionToken(),
                 description: this.extractJSDocDescription(property),
-                defaultValue: property.getInitializer()?.getText()
+                defaultValue: property.getInitializer()?.getText(),
             })
         }
 
@@ -262,7 +296,7 @@ export class TypeResolver {
             type: 'class',
             properties,
             filePath: sourceFile.getFilePath(),
-            description: this.extractJSDocDescription(classDecl)
+            description: this.extractJSDocDescription(classDecl),
         }
     }
 
@@ -271,7 +305,7 @@ export class TypeResolver {
      */
     private resolveEnum(enumDecl: any, sourceFile: SourceFile): ResolvedType {
         const properties: PropertyInfo[] = []
-        
+
         for (const member of enumDecl.getMembers()) {
             properties.push({
                 name: member.getName(),
@@ -280,11 +314,11 @@ export class TypeResolver {
                     type: 'union',
                     unionTypes: [
                         { name: 'string', type: 'primitive' },
-                        { name: 'number', type: 'primitive' }
-                    ]
+                        { name: 'number', type: 'primitive' },
+                    ],
                 },
                 optional: false,
-                defaultValue: member.getValue()
+                defaultValue: member.getValue(),
             })
         }
 
@@ -293,7 +327,7 @@ export class TypeResolver {
             type: 'enum',
             properties,
             filePath: sourceFile.getFilePath(),
-            description: this.extractJSDocDescription(enumDecl)
+            description: this.extractJSDocDescription(enumDecl),
         }
     }
 
@@ -325,7 +359,7 @@ export class TypeResolver {
     getCacheStats(): { size: number; keys: string[] } {
         return {
             size: this.typeCache.size,
-            keys: Array.from(this.typeCache.keys())
+            keys: Array.from(this.typeCache.keys()),
         }
     }
 }

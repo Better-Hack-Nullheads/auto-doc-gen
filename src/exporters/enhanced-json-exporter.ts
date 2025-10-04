@@ -1,13 +1,12 @@
 import { mkdirSync, writeFileSync } from 'fs'
 import { dirname } from 'path'
-import { 
-    EnhancedControllerInfo, 
-    EnhancedAnalysisResult, 
-    TypeSchema,
+import {
     AnalysisMetadata,
-    AnalysisSummary
+    AnalysisSummary,
+    EnhancedAnalysisResult,
+    EnhancedControllerInfo,
+    TypeSchema,
 } from '../types/enhanced-output.types'
-import { ResolvedType } from '../core/type-resolver'
 
 export interface EnhancedJsonOutputOptions {
     outputPath?: string
@@ -39,7 +38,11 @@ export class EnhancedJsonExporter {
         typeSchemas: TypeSchema,
         metadata: any
     ): Promise<string> {
-        const result = this.buildEnhancedResult(controllers, typeSchemas, metadata)
+        const result = this.buildEnhancedResult(
+            controllers,
+            typeSchemas,
+            metadata
+        )
         const jsonString = this.formatJson(result)
         await this.writeToFile(jsonString)
         return this.options.outputPath!
@@ -53,9 +56,16 @@ export class EnhancedJsonExporter {
         typeSchemas: TypeSchema,
         metadata: any
     ): EnhancedAnalysisResult {
-        const totalEndpoints = controllers.reduce((sum, c) => sum + c.endpoints.length, 0)
-        const totalDtos = Object.values(typeSchemas).filter(t => t.type === 'class').length
-        const totalInterfaces = Object.values(typeSchemas).filter(t => t.type === 'interface').length
+        const totalEndpoints = controllers.reduce(
+            (sum, c) => sum + c.endpoints.length,
+            0
+        )
+        const totalDtos = Object.values(typeSchemas).filter(
+            (t) => t.type === 'class'
+        ).length
+        const totalInterfaces = Object.values(typeSchemas).filter(
+            (t) => t.type === 'interface'
+        ).length
 
         const analysisMetadata: AnalysisMetadata = {
             generatedAt: new Date().toISOString(),
@@ -124,25 +134,25 @@ export class EnhancedJsonExporter {
             info: {
                 title: 'API Documentation',
                 version: '1.0.0',
-                description: 'Auto-generated API documentation'
+                description: 'Auto-generated API documentation',
             },
             servers: [
                 {
                     url: 'http://localhost:3000',
-                    description: 'Development server'
-                }
+                    description: 'Development server',
+                },
             ],
             paths: {} as Record<string, any>,
             components: {
-                schemas: {}
-            }
+                schemas: {},
+            },
         }
 
         // Add paths from controllers
         for (const controller of controllers) {
             for (const endpoint of controller.endpoints) {
                 const pathKey = endpoint.fullPath || endpoint.path
-                
+
                 if (!openapi.paths[pathKey]) {
                     openapi.paths[pathKey] = {}
                 }
@@ -150,23 +160,27 @@ export class EnhancedJsonExporter {
                 openapi.paths[pathKey][endpoint.method.toLowerCase()] = {
                     summary: endpoint.summary,
                     description: endpoint.description,
-                    parameters: endpoint.parameters.map(param => ({
+                    parameters: endpoint.parameters.map((param) => ({
                         name: param.name,
                         in: param.location,
                         required: param.required,
                         description: param.description,
-                        schema: param.schema
+                        schema: param.schema,
                     })),
-                    requestBody: endpoint.requestSchema ? {
-                        required: true,
-                        content: {
-                            'application/json': {
-                                schema: endpoint.requestSchema
-                            }
-                        }
-                    } : undefined,
+                    requestBody: endpoint.requestSchema
+                        ? {
+                              required: true,
+                              content: {
+                                  'application/json': {
+                                      schema: endpoint.requestSchema,
+                                  },
+                              },
+                          }
+                        : undefined,
                     responses: this.generateOpenAPIResponses(endpoint),
-                    tags: endpoint.tags || [controller.name.replace('Controller', '')]
+                    tags: endpoint.tags || [
+                        controller.name.replace('Controller', ''),
+                    ],
                 }
             }
         }
@@ -183,19 +197,24 @@ export class EnhancedJsonExporter {
         for (const statusCode of endpoint.statusCodes) {
             responses[statusCode.code] = {
                 description: statusCode.description,
-                content: endpoint.responseSchema ? {
-                    'application/json': {
-                        schema: endpoint.responseSchema,
-                        examples: endpoint.examples.reduce((acc: any, example: any) => {
-                            if (example.response) {
-                                acc[`example-${statusCode.code}`] = {
-                                    value: example.response
-                                }
-                            }
-                            return acc
-                        }, {})
-                    }
-                } : undefined
+                content: endpoint.responseSchema
+                    ? {
+                          'application/json': {
+                              schema: endpoint.responseSchema,
+                              examples: endpoint.examples.reduce(
+                                  (acc: any, example: any) => {
+                                      if (example.response) {
+                                          acc[`example-${statusCode.code}`] = {
+                                              value: example.response,
+                                          }
+                                      }
+                                      return acc
+                                  },
+                                  {}
+                              ),
+                          },
+                      }
+                    : undefined,
             }
         }
 
@@ -211,8 +230,10 @@ export class EnhancedJsonExporter {
     ): Promise<string> {
         const openapi = this.generateOpenAPIStructure(controllers)
         const jsonString = JSON.stringify(openapi, null, 2)
-        
-        const finalPath = outputPath || this.options.outputPath!.replace('.json', '-openapi.json')
+
+        const finalPath =
+            outputPath ||
+            this.options.outputPath!.replace('.json', '-openapi.json')
         const outputDir = dirname(finalPath)
 
         try {

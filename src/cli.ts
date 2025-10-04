@@ -211,10 +211,20 @@ program
 
 program
     .command('enhanced')
-    .description('Generate enhanced analysis with resolved types and API endpoints')
+    .description(
+        'Generate enhanced analysis with resolved types and API endpoints'
+    )
     .argument('<path>', 'Path to the NestJS project source directory')
-    .option('-o, --output <path>', 'Output file path', './docs/enhanced-analysis.json')
-    .option('-f, --format <format>', 'Output format: json, json-pretty', 'json-pretty')
+    .option(
+        '-o, --output <path>',
+        'Output file path',
+        './docs/enhanced-analysis.json'
+    )
+    .option(
+        '-f, --format <format>',
+        'Output format: json, json-pretty',
+        'json-pretty'
+    )
     .option('--openapi', 'Also generate OpenAPI specification', false)
     .option('-v, --verbose', 'Show verbose output', false)
     .action(async (path: string, options: any) => {

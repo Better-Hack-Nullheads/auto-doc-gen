@@ -1,0 +1,929 @@
+{
+  "metadata": {
+    "generatedAt": "2025-10-04T17:27:32.498Z",
+    "version": "2.0.0",
+    "projectPath": "../backend/src",
+    "analysisTime": 3.988,
+    "totalFiles": 10,
+    "totalControllers": 2,
+    "totalServices": 0,
+    "totalEndpoints": 8,
+    "totalTypes": 9
+  },
+  "apiEndpoints": [
+    {
+      "name": "AppController",
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/app.controller.ts",
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Handle GET endpoint",
+          "responseSchema": {
+            "type": "string",
+            "description": "Primitive type: string"
+          },
+          "parameters": [],
+          "validationRules": [],
+          "examples": [
+            {
+              "response": "string"
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 200,
+              "description": "Success"
+            },
+            {
+              "code": 404,
+              "description": "Not found"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Handle GET endpoint",
+          "responseSchema": {
+            "type": "object",
+            "description": "Primitive type: any"
+          },
+          "parameters": [],
+          "validationRules": [],
+          "examples": [
+            {
+              "response": {}
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 200,
+              "description": "Success"
+            },
+            {
+              "code": 404,
+              "description": "Not found"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Handle GET endpoint",
+          "responseSchema": {
+            "type": "object",
+            "description": "Primitive type: any"
+          },
+          "parameters": [],
+          "validationRules": [],
+          "examples": [
+            {
+              "response": {}
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 200,
+              "description": "Success"
+            },
+            {
+              "code": 404,
+              "description": "Not found"
+            }
+          ]
+        }
+      ],
+      "decorators": [
+        "Controller"
+      ],
+      "imports": [
+        {
+          "name": "AutoDocGenService",
+          "from": "@auto-doc-gen/core",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Controller",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Get",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "AppService",
+          "from": "./app.service",
+          "isDefault": false,
+          "isNamespace": false
+        }
+      ],
+      "dependencies": [
+        "string"
+      ]
+    },
+    {
+      "name": "ProductsController",
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/products.controller.ts",
+      "endpoints": [
+        {
+          "method": "POST",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Create POST endpoint",
+          "requestSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "optional": false
+              },
+              "description": {
+                "type": "string",
+                "optional": true
+              },
+              "price": {
+                "type": "number",
+                "optional": false
+              },
+              "category": {
+                "type": "string",
+                "optional": false
+              }
+            },
+            "required": [
+              "name",
+              "price",
+              "category"
+            ]
+          },
+          "responseSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "optional": false
+              },
+              "name": {
+                "type": "string",
+                "optional": false
+              },
+              "description": {
+                "type": "string",
+                "optional": true
+              },
+              "price": {
+                "type": "number",
+                "optional": false
+              },
+              "category": {
+                "type": "string",
+                "optional": false
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "optional": false
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "optional": false
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "price",
+              "category",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "parameters": [
+            {
+              "name": "createProductDto",
+              "type": "CreateProductDto",
+              "location": "body",
+              "required": true,
+              "validationRules": [],
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "optional": false
+                  },
+                  "description": {
+                    "type": "string",
+                    "optional": true
+                  },
+                  "price": {
+                    "type": "number",
+                    "optional": false
+                  },
+                  "category": {
+                    "type": "string",
+                    "optional": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "price",
+                  "category"
+                ]
+              }
+            }
+          ],
+          "validationRules": [],
+          "examples": [
+            {
+              "request": {
+                "name": "string",
+                "price": 0,
+                "category": "string"
+              },
+              "response": {
+                "id": "string",
+                "name": "string",
+                "price": 0,
+                "category": "string",
+                "createdAt": "2025-10-04T17:27:28.621Z",
+                "updatedAt": "2025-10-04T17:27:28.621Z"
+              }
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 201,
+              "description": "Created"
+            },
+            {
+              "code": 400,
+              "description": "Bad request"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Handle GET endpoint",
+          "responseSchema": {
+            "type": "array",
+            "description": "Array of Product",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "optional": false
+                },
+                "name": {
+                  "type": "string",
+                  "optional": false
+                },
+                "description": {
+                  "type": "string",
+                  "optional": true
+                },
+                "price": {
+                  "type": "number",
+                  "optional": false
+                },
+                "category": {
+                  "type": "string",
+                  "optional": false
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "optional": false
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "optional": false
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "price",
+                "category",
+                "createdAt",
+                "updatedAt"
+              ]
+            }
+          },
+          "parameters": [],
+          "validationRules": [],
+          "examples": [
+            {
+              "response": [
+                {
+                  "id": "string",
+                  "name": "string",
+                  "price": 0,
+                  "category": "string",
+                  "createdAt": "2025-10-04T17:27:28.622Z",
+                  "updatedAt": "2025-10-04T17:27:28.622Z"
+                }
+              ]
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 200,
+              "description": "Success"
+            },
+            {
+              "code": 404,
+              "description": "Not found"
+            }
+          ]
+        },
+        {
+          "method": "GET",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Handle GET endpoint",
+          "responseSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "optional": false
+              },
+              "name": {
+                "type": "string",
+                "optional": false
+              },
+              "description": {
+                "type": "string",
+                "optional": true
+              },
+              "price": {
+                "type": "number",
+                "optional": false
+              },
+              "category": {
+                "type": "string",
+                "optional": false
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "optional": false
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "optional": false
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "price",
+              "category",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "path",
+              "required": true,
+              "validationRules": [],
+              "schema": {
+                "type": "string",
+                "description": "Primitive type: string"
+              }
+            }
+          ],
+          "validationRules": [],
+          "examples": [
+            {
+              "response": {
+                "id": "string",
+                "name": "string",
+                "price": 0,
+                "category": "string",
+                "createdAt": "2025-10-04T17:27:28.622Z",
+                "updatedAt": "2025-10-04T17:27:28.622Z"
+              }
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 200,
+              "description": "Success"
+            },
+            {
+              "code": 404,
+              "description": "Not found"
+            }
+          ]
+        },
+        {
+          "method": "PATCH",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Update PATCH endpoint",
+          "requestSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "responseSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "optional": false
+              },
+              "name": {
+                "type": "string",
+                "optional": false
+              },
+              "description": {
+                "type": "string",
+                "optional": true
+              },
+              "price": {
+                "type": "number",
+                "optional": false
+              },
+              "category": {
+                "type": "string",
+                "optional": false
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "optional": false
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "optional": false
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "price",
+              "category",
+              "createdAt",
+              "updatedAt"
+            ]
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "path",
+              "required": true,
+              "validationRules": [],
+              "schema": {
+                "type": "string",
+                "description": "Primitive type: string"
+              }
+            },
+            {
+              "name": "updateProductDto",
+              "type": "UpdateProductDto",
+              "location": "body",
+              "required": true,
+              "validationRules": [],
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          ],
+          "validationRules": [],
+          "examples": [
+            {
+              "request": {},
+              "response": {
+                "id": "string",
+                "name": "string",
+                "price": 0,
+                "category": "string",
+                "createdAt": "2025-10-04T17:27:28.623Z",
+                "updatedAt": "2025-10-04T17:27:28.623Z"
+              }
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 200,
+              "description": "Success"
+            },
+            {
+              "code": 404,
+              "description": "Not found"
+            }
+          ]
+        },
+        {
+          "method": "DELETE",
+          "path": "",
+          "fullPath": "/",
+          "summary": "Delete DELETE endpoint",
+          "responseSchema": {
+            "type": "string",
+            "description": "Unknown type: { message: string }"
+          },
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "location": "path",
+              "required": true,
+              "validationRules": [],
+              "schema": {
+                "type": "string",
+                "description": "Primitive type: string"
+              }
+            }
+          ],
+          "validationRules": [],
+          "examples": [
+            {
+              "response": "string"
+            }
+          ],
+          "statusCodes": [
+            {
+              "code": 200,
+              "description": "Success"
+            },
+            {
+              "code": 404,
+              "description": "Not found"
+            }
+          ]
+        }
+      ],
+      "decorators": [
+        "Controller"
+      ],
+      "imports": [
+        {
+          "name": "Body",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Controller",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Delete",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Get",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "HttpException",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "HttpStatus",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Param",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Patch",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Post",
+          "from": "@nestjs/common",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "CreateProductDto",
+          "from": "./dto/create-product.dto",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "UpdateProductDto",
+          "from": "./dto/update-product.dto",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "Product",
+          "from": "./products.service",
+          "isDefault": false,
+          "isNamespace": false
+        },
+        {
+          "name": "ProductsService",
+          "from": "./products.service",
+          "isDefault": false,
+          "isNamespace": false
+        }
+      ],
+      "dependencies": [
+        "Product",
+        "Product[]",
+        "{ message: string }"
+      ]
+    }
+  ],
+  "typeSchemas": {
+    "AppController": {
+      "name": "AppController",
+      "type": "class",
+      "properties": [],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/app.controller.ts"
+    },
+    "AppModule": {
+      "name": "AppModule",
+      "type": "class",
+      "properties": [],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/app.module.ts"
+    },
+    "AppService": {
+      "name": "AppService",
+      "type": "class",
+      "properties": [],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/app.service.ts"
+    },
+    "CreateProductDto": {
+      "name": "CreateProductDto",
+      "type": "class",
+      "properties": [
+        {
+          "name": "name",
+          "type": {
+            "name": "string",
+            "type": "primitive",
+            "description": "Primitive type: string"
+          },
+          "optional": false
+        },
+        {
+          "name": "description",
+          "type": {
+            "name": "string",
+            "type": "primitive",
+            "description": "Primitive type: string"
+          },
+          "optional": true
+        },
+        {
+          "name": "price",
+          "type": {
+            "name": "number",
+            "type": "primitive",
+            "description": "Primitive type: number"
+          },
+          "optional": false
+        },
+        {
+          "name": "category",
+          "type": {
+            "name": "string",
+            "type": "primitive",
+            "description": "Primitive type: string"
+          },
+          "optional": false
+        }
+      ],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/dto/create-product.dto.ts"
+    },
+    "UpdateProductDto": {
+      "name": "UpdateProductDto",
+      "type": "class",
+      "properties": [],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/dto/update-product.dto.ts"
+    },
+    "ProductsController": {
+      "name": "ProductsController",
+      "type": "class",
+      "properties": [],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/products.controller.ts"
+    },
+    "ProductsModule": {
+      "name": "ProductsModule",
+      "type": "class",
+      "properties": [],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/products.module.ts"
+    },
+    "Product": {
+      "name": "Product",
+      "type": "interface",
+      "properties": [
+        {
+          "name": "id",
+          "type": {
+            "name": "string",
+            "type": "primitive",
+            "description": "Primitive type: string"
+          },
+          "optional": false
+        },
+        {
+          "name": "name",
+          "type": {
+            "name": "string",
+            "type": "primitive",
+            "description": "Primitive type: string"
+          },
+          "optional": false
+        },
+        {
+          "name": "description",
+          "type": {
+            "name": "string",
+            "type": "primitive",
+            "description": "Primitive type: string"
+          },
+          "optional": true
+        },
+        {
+          "name": "price",
+          "type": {
+            "name": "number",
+            "type": "primitive",
+            "description": "Primitive type: number"
+          },
+          "optional": false
+        },
+        {
+          "name": "category",
+          "type": {
+            "name": "string",
+            "type": "primitive",
+            "description": "Primitive type: string"
+          },
+          "optional": false
+        },
+        {
+          "name": "createdAt",
+          "type": {
+            "name": "Date",
+            "type": "primitive",
+            "description": "Primitive type: Date"
+          },
+          "optional": false
+        },
+        {
+          "name": "updatedAt",
+          "type": {
+            "name": "Date",
+            "type": "primitive",
+            "description": "Primitive type: Date"
+          },
+          "optional": false
+        }
+      ],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/products.service.ts"
+    },
+    "ProductsService": {
+      "name": "ProductsService",
+      "type": "class",
+      "properties": [
+        {
+          "name": "products",
+          "type": {
+            "name": "Product[]",
+            "type": "array",
+            "items": {
+              "name": "Product",
+              "type": "interface",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": {
+                    "name": "string",
+                    "type": "primitive",
+                    "description": "Primitive type: string"
+                  },
+                  "optional": false
+                },
+                {
+                  "name": "name",
+                  "type": {
+                    "name": "string",
+                    "type": "primitive",
+                    "description": "Primitive type: string"
+                  },
+                  "optional": false
+                },
+                {
+                  "name": "description",
+                  "type": {
+                    "name": "string",
+                    "type": "primitive",
+                    "description": "Primitive type: string"
+                  },
+                  "optional": true
+                },
+                {
+                  "name": "price",
+                  "type": {
+                    "name": "number",
+                    "type": "primitive",
+                    "description": "Primitive type: number"
+                  },
+                  "optional": false
+                },
+                {
+                  "name": "category",
+                  "type": {
+                    "name": "string",
+                    "type": "primitive",
+                    "description": "Primitive type: string"
+                  },
+                  "optional": false
+                },
+                {
+                  "name": "createdAt",
+                  "type": {
+                    "name": "Date",
+                    "type": "primitive",
+                    "description": "Primitive type: Date"
+                  },
+                  "optional": false
+                },
+                {
+                  "name": "updatedAt",
+                  "type": {
+                    "name": "Date",
+                    "type": "primitive",
+                    "description": "Primitive type: Date"
+                  },
+                  "optional": false
+                }
+              ],
+              "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/products.service.ts"
+            },
+            "description": "Array of Product"
+          },
+          "optional": false,
+          "defaultValue": "[]"
+        },
+        {
+          "name": "nextId",
+          "type": {
+            "name": "any",
+            "type": "primitive",
+            "description": "Primitive type: any"
+          },
+          "optional": false,
+          "defaultValue": "1"
+        }
+      ],
+      "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/products.service.ts"
+    }
+  },
+  "summary": {
+    "controllers": 2,
+    "services": 0,
+    "totalEndpoints": 8,
+    "totalTypes": 9,
+    "totalDtos": 8,
+    "totalInterfaces": 1,
+    "analysisTime": 3.988
+  }
+}

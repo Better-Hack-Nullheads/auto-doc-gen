@@ -1,5 +1,9 @@
 import { ResolvedType } from '../core/type-resolver'
-import { JsonSchema, PropertySchema, ValidationRule } from '../types/enhanced-output.types'
+import {
+    JsonSchema,
+    PropertySchema,
+    ValidationRule,
+} from '../types/enhanced-output.types'
 
 export class SchemaGenerator {
     /**
@@ -19,7 +23,10 @@ export class SchemaGenerator {
             case 'enum':
                 return this.generateEnumSchema(resolvedType)
             default:
-                return { type: 'object', description: `Unknown type: ${resolvedType.name}` }
+                return {
+                    type: 'object',
+                    description: `Unknown type: ${resolvedType.name}`,
+                }
         }
     }
 
@@ -28,19 +35,19 @@ export class SchemaGenerator {
      */
     private generatePrimitiveSchema(resolvedType: ResolvedType): JsonSchema {
         const typeMapping: Record<string, string> = {
-            'string': 'string',
-            'number': 'number',
-            'boolean': 'boolean',
-            'Date': 'string',
-            'any': 'object',
-            'void': 'null',
-            'null': 'null',
-            'undefined': 'null'
+            string: 'string',
+            number: 'number',
+            boolean: 'boolean',
+            Date: 'string',
+            any: 'object',
+            void: 'null',
+            null: 'null',
+            undefined: 'null',
         }
 
         const schema: JsonSchema = {
             type: typeMapping[resolvedType.name] || 'string',
-            description: resolvedType.description
+            description: resolvedType.description,
         }
 
         // Add format for Date
@@ -59,7 +66,7 @@ export class SchemaGenerator {
             type: 'object',
             description: resolvedType.description,
             properties: {},
-            required: []
+            required: [],
         }
 
         if (resolvedType.properties) {
@@ -82,7 +89,7 @@ export class SchemaGenerator {
     private generateArraySchema(resolvedType: ResolvedType): JsonSchema {
         const schema: JsonSchema = {
             type: 'array',
-            description: resolvedType.description
+            description: resolvedType.description,
         }
 
         if (resolvedType.items) {
@@ -101,9 +108,13 @@ export class SchemaGenerator {
         }
 
         // Handle simple union types (string | number | boolean)
-        const primitiveTypes = resolvedType.unionTypes.filter(t => t.type === 'primitive')
+        const primitiveTypes = resolvedType.unionTypes.filter(
+            (t) => t.type === 'primitive'
+        )
         if (primitiveTypes.length === resolvedType.unionTypes.length) {
-            const types = primitiveTypes.map(t => this.mapPrimitiveType(t.name))
+            const types = primitiveTypes.map((t) =>
+                this.mapPrimitiveType(t.name)
+            )
             if (types.length === 1) {
                 return { type: types[0], description: resolvedType.description }
             }
@@ -111,10 +122,12 @@ export class SchemaGenerator {
         }
 
         // Handle complex union types with oneOf
-        const schemas = resolvedType.unionTypes.map(t => this.generateSchema(t))
+        const schemas = resolvedType.unionTypes.map((t) =>
+            this.generateSchema(t)
+        )
         return {
             oneOf: schemas,
-            description: resolvedType.description
+            description: resolvedType.description,
         } as any
     }
 
@@ -124,11 +137,13 @@ export class SchemaGenerator {
     private generateEnumSchema(resolvedType: ResolvedType): JsonSchema {
         const schema: JsonSchema = {
             type: 'string',
-            description: resolvedType.description
+            description: resolvedType.description,
         }
 
         if (resolvedType.properties) {
-            const enumValues = resolvedType.properties.map(p => p.defaultValue).filter(v => v !== undefined)
+            const enumValues = resolvedType.properties
+                .map((p) => p.defaultValue)
+                .filter((v) => v !== undefined)
             if (enumValues.length > 0) {
                 schema.enum = enumValues
             }
@@ -142,12 +157,14 @@ export class SchemaGenerator {
      */
     private generatePropertySchema(property: any): PropertySchema {
         const baseSchema = this.generateSchema(property.type)
-        
+
         return {
             ...baseSchema,
             description: property.description,
             optional: property.optional,
-            examples: property.defaultValue ? [property.defaultValue] : undefined
+            examples: property.defaultValue
+                ? [property.defaultValue]
+                : undefined,
         }
     }
 
@@ -156,14 +173,14 @@ export class SchemaGenerator {
      */
     private mapPrimitiveType(typeName: string): string {
         const mapping: Record<string, string> = {
-            'string': 'string',
-            'number': 'number',
-            'boolean': 'boolean',
-            'Date': 'string',
-            'any': 'object',
-            'void': 'null',
-            'null': 'null',
-            'undefined': 'null'
+            string: 'string',
+            number: 'number',
+            boolean: 'boolean',
+            Date: 'string',
+            any: 'object',
+            void: 'null',
+            null: 'null',
+            undefined: 'null',
         }
         return mapping[typeName] || 'string'
     }
@@ -185,31 +202,35 @@ export class SchemaGenerator {
                     return schema.enum[0]
                 }
                 return 'string'
-            
+
             case 'number':
                 return 0
-            
+
             case 'boolean':
                 return true
-            
+
             case 'array':
                 if (schema.items) {
                     return [this.generateExample(schema.items)]
                 }
                 return []
-            
+
             case 'object':
                 if (schema.properties) {
                     const example: any = {}
-                    for (const [key, prop] of Object.entries(schema.properties)) {
+                    for (const [key, prop] of Object.entries(
+                        schema.properties
+                    )) {
                         if (!schema.required || schema.required.includes(key)) {
-                            example[key] = this.generateExample(prop as JsonSchema)
+                            example[key] = this.generateExample(
+                                prop as JsonSchema
+                            )
                         }
                     }
                     return example
                 }
                 return {}
-            
+
             default:
                 return null
         }
@@ -218,7 +239,10 @@ export class SchemaGenerator {
     /**
      * Generate request/response examples
      */
-    generateExamples(requestSchema?: JsonSchema, responseSchema?: JsonSchema): {
+    generateExamples(
+        requestSchema?: JsonSchema,
+        responseSchema?: JsonSchema
+    ): {
         request?: any
         response?: any
     } {
@@ -238,7 +262,9 @@ export class SchemaGenerator {
     /**
      * Convert validation rules to JSON Schema constraints
      */
-    convertValidationRulesToSchema(validationRules: ValidationRule[]): Partial<JsonSchema> {
+    convertValidationRulesToSchema(
+        validationRules: ValidationRule[]
+    ): Partial<JsonSchema> {
         const schema: Partial<JsonSchema> = {}
 
         for (const rule of validationRules) {
@@ -266,22 +292,22 @@ export class SchemaGenerator {
                     break
                 case 'MinLength':
                     if (rule.value !== undefined) {
-                        (schema as any).minLength = rule.value
+                        ;(schema as any).minLength = rule.value
                     }
                     break
                 case 'MaxLength':
                     if (rule.value !== undefined) {
-                        (schema as any).maxLength = rule.value
+                        ;(schema as any).maxLength = rule.value
                     }
                     break
                 case 'Min':
                     if (rule.value !== undefined) {
-                        (schema as any).minimum = rule.value
+                        ;(schema as any).minimum = rule.value
                     }
                     break
                 case 'Max':
                     if (rule.value !== undefined) {
-                        (schema as any).maximum = rule.value
+                        ;(schema as any).maximum = rule.value
                     }
                     break
                 case 'IsEnum':
