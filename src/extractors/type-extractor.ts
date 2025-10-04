@@ -185,7 +185,9 @@ export class TypeExtractor {
         }
     }
 
-    private extractPropertyDecorators(property: PropertyDeclaration | any): string[] {
+    private extractPropertyDecorators(
+        property: PropertyDeclaration | any
+    ): string[] {
         // Only PropertyDeclaration has getDecorators method
         if (typeof property.getDecorators === 'function') {
             const decorators = property.getDecorators()
@@ -205,11 +207,13 @@ export class TypeExtractor {
         if (typeof property.getDecorators !== 'function') {
             return []
         }
-        
+
         const decorators = property.getDecorators()
-        return decorators.map((decorator) => ({
+        return decorators.map((decorator: any) => ({
             decorator: decorator.getName(),
-            parameters: decorator.getArguments().map((arg) => arg.getText()),
+            parameters: decorator
+                .getArguments()
+                .map((arg: any) => arg.getText()),
             message: this.extractValidationMessage(decorator),
         }))
     }
@@ -226,7 +230,12 @@ export class TypeExtractor {
         return undefined
     }
 
-    private extractDefaultValue(property: PropertyDeclaration): any {
+    private extractDefaultValue(property: PropertyDeclaration | any): any {
+        // Only PropertyDeclaration has getInitializer method
+        if (typeof property.getInitializer !== 'function') {
+            return undefined
+        }
+
         const initializer = property.getInitializer()
         if (initializer) {
             return initializer.getText()
