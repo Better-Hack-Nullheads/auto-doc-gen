@@ -48,9 +48,9 @@ export class ConfigLoader {
         const configPath = join(currentDir, this.CONFIG_FILE)
 
         if (!existsSync(configPath)) {
-            this.createDefaultConfig(configPath)
-            console.log(`✅ Created default config file: ${this.CONFIG_FILE}`)
-            console.log(`📝 Edit ${this.CONFIG_FILE} to customize settings`)
+            console.log(`📝 No config file found: ${this.CONFIG_FILE}`)
+            console.log(`💡 Run 'auto-doc-gen config' to create a default configuration file`)
+            return this.DEFAULT_CONFIG
         }
 
         try {
@@ -69,7 +69,7 @@ export class ConfigLoader {
     /**
      * Create default configuration file
      */
-    private static createDefaultConfig(configPath: string): void {
+    static createDefaultConfig(configPath: string): void {
         const configContent = JSON.stringify(this.DEFAULT_CONFIG, null, 2)
         writeFileSync(configPath, configContent, 'utf8')
     }

@@ -15,7 +15,8 @@
         "lint": "eslint src/**/*.ts",
         "docs": "auto-doc-gen export src",
         "docs:analyze": "auto-doc-gen analyze src",
-        "docs:save": "auto-doc-gen save src"
+        "docs:save": "auto-doc-gen save src",
+        "docs:config": "auto-doc-gen config"
     },
     "keywords": [
         "nestjs",
