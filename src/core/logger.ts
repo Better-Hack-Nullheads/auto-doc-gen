@@ -16,10 +16,10 @@ export class Logger {
     logResults(
         controllers: ControllerInfo[],
         services: ServiceInfo[],
-        analysisTime: number
+        _analysisTime: number
     ): void {
         this.logHeader()
-        this.logSummary(controllers, services, analysisTime)
+        this.logSummary(controllers, services)
         this.logControllers(controllers)
         this.logServices(services)
     }
@@ -43,18 +43,8 @@ export class Logger {
      */
     private logSummary(
         controllers: ControllerInfo[],
-        services: ServiceInfo[],
-        analysisTime: number
+        services: ServiceInfo[]
     ): void {
-        const totalControllerMethods = controllers.reduce(
-            (sum, c) => sum + c.methods.length,
-            0
-        )
-        const totalServiceMethods = services.reduce(
-            (sum, s) => sum + s.methods.length,
-            0
-        )
-
         if (this.options.colorOutput) {
             console.log(
                 chalk.green(`📁 Controllers Found: ${controllers.length}`)

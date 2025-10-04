@@ -1,8 +1,11 @@
 import { Project } from 'ts-morph'
+import { JsonExporter } from '../exporters/json-exporter'
 import { ControllerExtractor } from '../extractors/controller-extractor'
 import { ServiceExtractor } from '../extractors/service-extractor'
+import { TypeExtractor } from '../extractors/type-extractor'
 import { SimpleOptions } from '../types/common.types'
 import { ControllerInfo } from '../types/controller.types'
+import { JsonOutputOptions } from '../types/json-output.types'
 import { ServiceInfo } from '../types/service.types'
 import { FileUtils } from '../utils/file-utils'
 import { Logger } from './logger'
@@ -12,6 +15,7 @@ export class AutoDocGen {
     private project: Project
     private controllerExtractor: ControllerExtractor
     private serviceExtractor: ServiceExtractor
+    private typeExtractor: TypeExtractor
     private logger: Logger
 
     constructor(options: SimpleOptions = {}) {
@@ -29,6 +33,7 @@ export class AutoDocGen {
 
         this.controllerExtractor = new ControllerExtractor(this.project)
         this.serviceExtractor = new ServiceExtractor(this.project)
+        this.typeExtractor = new TypeExtractor(this.project)
         this.logger = new Logger(this.options)
     }
 
@@ -178,5 +183,84 @@ export class AutoDocGen {
         const analysisTime = (Date.now() - startTime) / 1000
 
         return { controllers, services, analysisTime }
+    }
+
+    /**
+     * Export analysis results to JSON file
+     */
+    async exportToJson(
+        projectPath: string,
+        options: JsonOutputOptions
+    ): Promise<string> {
+        const startTime = Date.now()
+
+        try {
+            if (this.options.verbose) {
+                console.log(`🔍 Starting JSON export for: ${projectPath}`)
+            }
+
+            // Find all TypeScript files
+            const files = await FileUtils.findTypeScriptFiles(projectPath)
+
+            if (files.length === 0) {
+                throw new Error(
+                    'No TypeScript files found in the specified directory.'
+                )
+            }
+
+            // Add files to the project
+            const sourceFiles = files
+                .map((file) => {
+                    try {
+                        return this.project.addSourceFileAtPath(file)
+                    } catch (error) {
+                        if (this.options.verbose) {
+                            console.warn(
+                                `⚠️  Could not parse file: ${file}`,
+                                error
+                            )
+                        }
+                        return null
+                    }
+                })
+                .filter((file) => file !== null)
+
+            // Extract controllers, services, and types
+            const controllers = await this.findControllers(sourceFiles)
+            const services = await this.findServices(sourceFiles)
+            const types = this.typeExtractor.extractAllTypes(sourceFiles)
+
+            const analysisTime = (Date.now() - startTime) / 1000
+
+            // Create metadata
+            const metadata = {
+                projectPath,
+                analysisTime,
+                totalFiles: files.length,
+            }
+
+            // Export to JSON
+            const jsonExporter = new JsonExporter(options)
+            const outputPath = await jsonExporter.exportAnalysis(
+                controllers,
+                services,
+                types,
+                metadata
+            )
+
+            if (this.options.verbose) {
+                console.log(
+                    `✅ JSON export completed in ${analysisTime.toFixed(2)}s`
+                )
+                console.log(`📁 Controllers: ${controllers.length}`)
+                console.log(`📁 Services: ${services.length}`)
+                console.log(`📁 Types: ${types.length}`)
+            }
+
+            return outputPath
+        } catch (error) {
+            console.error('❌ JSON export failed:', error)
+            throw error
+        }
     }
 }
