@@ -2,8 +2,8 @@
 
 import { Command } from 'commander'
 import * as fs from 'fs'
-import { join } from 'path'
 import { existsSync } from 'fs'
+import { join } from 'path'
 import { MongoDBAdapter } from './adapters/mongodb-adapter'
 import { ConfigLoader } from './config/config-loader'
 import { AutoDocGen } from './core/analyzer'
@@ -25,15 +25,19 @@ program
         try {
             const currentDir = process.cwd()
             const configPath = join(currentDir, 'autodocgen.config.json')
-            
+
             if (existsSync(configPath) && !options.force) {
-                console.log('📝 Configuration file already exists: autodocgen.config.json')
+                console.log(
+                    '📝 Configuration file already exists: autodocgen.config.json'
+                )
                 console.log('💡 Use --force to overwrite existing config file')
                 return
             }
-            
+
             ConfigLoader.createDefaultConfig(configPath)
-            console.log('✅ Created default config file: autodocgen.config.json')
+            console.log(
+                '✅ Created default config file: autodocgen.config.json'
+            )
             console.log('📝 Edit autodocgen.config.json to customize settings')
             console.log('🚀 You can now run: auto-doc-gen analyze src')
         } catch (error) {

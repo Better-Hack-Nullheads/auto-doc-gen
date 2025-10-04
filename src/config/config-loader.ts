@@ -49,7 +49,9 @@ export class ConfigLoader {
 
         if (!existsSync(configPath)) {
             console.log(`📝 No config file found: ${this.CONFIG_FILE}`)
-            console.log(`💡 Run 'auto-doc-gen config' to create a default configuration file`)
+            console.log(
+                `💡 Run 'auto-doc-gen config' to create a default configuration file`
+            )
             return this.DEFAULT_CONFIG
         }
 
