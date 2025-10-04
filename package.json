@@ -32,7 +32,8 @@
         "ai": "^3.0.0",
         "commander": "^11.0.0",
         "dotenv": "^17.2.3",
-        "mongodb": "^6.0.0"
+        "mongodb": "^6.0.0",
+        "ts-morph": "^21.0.0"
     },
     "devDependencies": {
         "@types/node": "^20.19.19",

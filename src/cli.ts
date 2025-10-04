@@ -7,6 +7,7 @@ import { existsSync } from 'fs'
 import { join } from 'path'
 import { MongoDBAdapter } from './adapters/mongodb-adapter'
 import { ConfigLoader } from './config/config-loader'
+import { Analyzer } from './core/analyzer'
 import { AIService } from './services/ai-service'
 
 // Load environment variables from .env file
@@ -49,7 +50,52 @@ program
         }
     })
 
-// Command 2: AI Analysis (Core Command)
+// Command 2: Analyze Project
+program
+    .command('analyze')
+    .description('Analyze project and generate fresh analysis JSON')
+    .option('-p, --path <path>', 'Project path to analyze', 'src')
+    .option('-o, --output <file>', 'Output file path', 'docs/analysis.json')
+    .action(async (options: any) => {
+        try {
+            const projectPath = join(process.cwd(), options.path)
+            const outputPath = join(process.cwd(), options.output)
+
+            console.log(`🔍 Starting project analysis...`)
+            console.log(`📁 Project path: ${projectPath}`)
+            console.log(`📄 Output file: ${outputPath}`)
+
+            // Create analyzer
+            const analyzer = new Analyzer(projectPath)
+
+            // Analyze project
+            const analysisResult = await analyzer.analyzeProject()
+
+            // Ensure output directory exists
+            const outputDir = join(outputPath, '..')
+            if (!existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true })
+            }
+
+            // Write analysis result
+            fs.writeFileSync(
+                outputPath,
+                JSON.stringify(analysisResult, null, 2),
+                'utf8'
+            )
+
+            console.log(`✅ Analysis completed!`)
+            console.log(
+                `📊 Results: ${analysisResult.metadata.totalControllers} controllers, ${analysisResult.metadata.totalServices} services, ${analysisResult.metadata.totalTypes} types`
+            )
+            console.log(`📄 Saved to: ${outputPath}`)
+        } catch (error) {
+            console.error('❌ Analysis failed:', error)
+            process.exit(1)
+        }
+    })
+
+// Command 3: AI Analysis (Core Command)
 program
     .command('ai')
     .description('Generate AI documentation from JSON input')
@@ -151,6 +197,40 @@ program
             // Read JSON data
             const analysisData = JSON.parse(fs.readFileSync(jsonFile, 'utf8'))
 
+            // Save raw JSON data that will be sent to AI
+            const rawJsonPath = join(
+                process.cwd(),
+                config.ai.outputDir,
+                'raw-ai-input.json'
+            )
+            const outputDir = join(process.cwd(), config.ai.outputDir)
+            if (!existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true })
+            }
+
+            // Create the data structure that will be sent to AI
+            const aiInputData = {
+                timestamp: new Date().toISOString(),
+                provider: provider,
+                model: model,
+                analysisData: analysisData,
+                promptTemplate: 'default', // You can make this configurable later
+                metadata: {
+                    totalControllers:
+                        analysisData.metadata?.totalControllers || 0,
+                    totalServices: analysisData.metadata?.totalServices || 0,
+                    totalTypes: analysisData.metadata?.totalTypes || 0,
+                    totalMethods: analysisData.metadata?.totalMethods || 0,
+                },
+            }
+
+            fs.writeFileSync(
+                rawJsonPath,
+                JSON.stringify(aiInputData, null, 2),
+                'utf8'
+            )
+            console.log(`💾 Raw AI input saved to: ${rawJsonPath}`)
+
             // Create AI service
             const aiConfig = {
                 provider: provider as 'google' | 'openai' | 'anthropic',
@@ -169,12 +249,6 @@ program
             // Output results
             const outputPath =
                 options.output || `${config.ai.outputDir}/ai-analysis.md`
-
-            // Ensure output directory exists
-            const outputDir = join(process.cwd(), config.ai.outputDir)
-            if (!existsSync(outputDir)) {
-                fs.mkdirSync(outputDir, { recursive: true })
-            }
 
             // Write AI analysis to file
             fs.writeFileSync(outputPath, aiAnalysis)
