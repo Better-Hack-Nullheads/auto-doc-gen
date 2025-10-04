@@ -38,7 +38,10 @@ export class AutoDocGen {
             skipAddingFilesFromTsConfig: true,
         })
 
-        this.controllerExtractor = new ControllerExtractor(this.project)
+        this.controllerExtractor = new ControllerExtractor(
+            this.project,
+            this.options
+        )
         this.serviceExtractor = new ServiceExtractor(this.project)
         this.typeExtractor = new TypeExtractor(this.project)
         this.typeResolver = new TypeResolver(this.project)

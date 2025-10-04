@@ -19,11 +19,13 @@ export class ControllerExtractor {
     private project: Project
     private typeResolver: TypeResolver
     private schemaGenerator: SchemaGenerator
+    private options?: any
 
-    constructor(project: Project) {
+    constructor(project: Project, options?: any) {
         this.project = project
         this.typeResolver = new TypeResolver(project)
         this.schemaGenerator = new SchemaGenerator()
+        this.options = options
     }
 
     /**
@@ -75,7 +77,22 @@ export class ControllerExtractor {
             const firstArg = args[0]
             if (firstArg.getKind() === 10) {
                 // StringLiteral
-                return firstArg.getText().replace(/['"]/g, '')
+                const path = firstArg.getText().replace(/['"]/g, '')
+                if (this.options?.verbose) {
+                    console.log(`Found controller path: "${path}"`)
+                }
+                return path
+            } else {
+                // Try to get text representation for other types
+                const text = firstArg.getText()
+                if (this.options?.verbose) {
+                    console.log(
+                        `Controller decorator arg type: ${firstArg.getKind()}, text: "${text}"`
+                    )
+                }
+                if (text && text !== 'undefined') {
+                    return text.replace(/['"`]/g, '')
+                }
             }
         }
 
@@ -185,7 +202,7 @@ export class ControllerExtractor {
                     sourceFile
                 )
 
-                return {
+                const controllerInfo = {
                     name: classDeclaration.getName() || 'UnknownController',
                     filePath: sourceFile.getFilePath(),
                     basePath,
@@ -196,6 +213,15 @@ export class ControllerExtractor {
                     imports: this.extractImports(sourceFile),
                     dependencies: this.extractDependencies(classDeclaration),
                 }
+
+                // Debug logging
+                if (this.options?.verbose) {
+                    console.log(
+                        `Controller: ${controllerInfo.name}, basePath: ${basePath}`
+                    )
+                }
+
+                return controllerInfo
             }
         }
 
@@ -295,12 +321,23 @@ export class ControllerExtractor {
                 const args = decorator.getArguments()
                 if (args.length > 0) {
                     const firstArg = args[0]
+                    // Handle different types of arguments
                     if (firstArg.getKind() === 10) {
                         // StringLiteral
-                        return firstArg.getText().replace(/['"]/g, '')
+                        const path = firstArg.getText().replace(/['"]/g, '')
+                        return path
+                    } else if (firstArg.getKind() === 8) {
+                        // TemplateExpression (for template literals)
+                        return firstArg.getText().replace(/[`]/g, '')
+                    } else {
+                        // Try to get text representation
+                        const text = firstArg.getText()
+                        if (text && text !== 'undefined') {
+                            return text.replace(/['"`]/g, '')
+                        }
                     }
                 }
-                return '' // Default empty path
+                return '' // Default empty path for methods without explicit paths
             }
         }
 

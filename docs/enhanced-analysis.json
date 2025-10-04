@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generatedAt": "2025-10-04T17:27:32.498Z",
+    "generatedAt": "2025-10-04T17:31:20.274Z",
     "version": "2.0.0",
     "projectPath": "../backend/src",
-    "analysisTime": 3.988,
+    "analysisTime": 4.527,
     "totalFiles": 10,
     "totalControllers": 2,
     "totalServices": 0,
@@ -44,8 +44,8 @@
         },
         {
           "method": "GET",
-          "path": "",
-          "fullPath": "/",
+          "path": "analyze",
+          "fullPath": "/analyze",
           "summary": "Handle GET endpoint",
           "responseSchema": {
             "type": "object",
@@ -71,8 +71,8 @@
         },
         {
           "method": "GET",
-          "path": "",
-          "fullPath": "/",
+          "path": "analysis-results",
+          "fullPath": "/analysis-results",
           "summary": "Handle GET endpoint",
           "responseSchema": {
             "type": "object",
@@ -256,8 +256,8 @@
                 "name": "string",
                 "price": 0,
                 "category": "string",
-                "createdAt": "2025-10-04T17:27:28.621Z",
-                "updatedAt": "2025-10-04T17:27:28.621Z"
+                "createdAt": "2025-10-04T17:31:15.847Z",
+                "updatedAt": "2025-10-04T17:31:15.847Z"
               }
             }
           ],
@@ -334,8 +334,8 @@
                   "name": "string",
                   "price": 0,
                   "category": "string",
-                  "createdAt": "2025-10-04T17:27:28.622Z",
-                  "updatedAt": "2025-10-04T17:27:28.622Z"
+                  "createdAt": "2025-10-04T17:31:15.848Z",
+                  "updatedAt": "2025-10-04T17:31:15.848Z"
                 }
               ]
             }
@@ -353,8 +353,8 @@
         },
         {
           "method": "GET",
-          "path": "",
-          "fullPath": "/",
+          "path": ":id",
+          "fullPath": "/:id",
           "summary": "Handle GET endpoint",
           "responseSchema": {
             "type": "object",
@@ -420,8 +420,8 @@
                 "name": "string",
                 "price": 0,
                 "category": "string",
-                "createdAt": "2025-10-04T17:27:28.622Z",
-                "updatedAt": "2025-10-04T17:27:28.622Z"
+                "createdAt": "2025-10-04T17:31:15.848Z",
+                "updatedAt": "2025-10-04T17:31:15.848Z"
               }
             }
           ],
@@ -438,8 +438,8 @@
         },
         {
           "method": "PATCH",
-          "path": "",
-          "fullPath": "/",
+          "path": ":id",
+          "fullPath": "/:id",
           "summary": "Update PATCH endpoint",
           "requestSchema": {
             "type": "object",
@@ -523,8 +523,8 @@
                 "name": "string",
                 "price": 0,
                 "category": "string",
-                "createdAt": "2025-10-04T17:27:28.623Z",
-                "updatedAt": "2025-10-04T17:27:28.623Z"
+                "createdAt": "2025-10-04T17:31:15.849Z",
+                "updatedAt": "2025-10-04T17:31:15.849Z"
               }
             }
           ],
@@ -541,8 +541,8 @@
         },
         {
           "method": "DELETE",
-          "path": "",
-          "fullPath": "/",
+          "path": ":id",
+          "fullPath": "/:id",
           "summary": "Delete DELETE endpoint",
           "responseSchema": {
             "type": "string",
@@ -924,6 +924,6 @@
     "totalTypes": 9,
     "totalDtos": 8,
     "totalInterfaces": 1,
-    "analysisTime": 3.988
+    "analysisTime": 4.527
   }
 }
