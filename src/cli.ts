@@ -210,6 +210,38 @@ program
     })
 
 program
+    .command('enhanced')
+    .description('Generate enhanced analysis with resolved types and API endpoints')
+    .argument('<path>', 'Path to the NestJS project source directory')
+    .option('-o, --output <path>', 'Output file path', './docs/enhanced-analysis.json')
+    .option('-f, --format <format>', 'Output format: json, json-pretty', 'json-pretty')
+    .option('--openapi', 'Also generate OpenAPI specification', false)
+    .option('-v, --verbose', 'Show verbose output', false)
+    .action(async (path: string, options: any) => {
+        try {
+            const analyzer = new AutoDocGen({
+                verbose: options.verbose,
+                colorOutput: true,
+            })
+
+            const outputPath = await analyzer.exportEnhancedAnalysis(path, {
+                outputPath: options.output,
+                format: options.format,
+            })
+
+            console.log(`✅ Enhanced analysis exported to: ${outputPath}`)
+
+            if (options.openapi) {
+                // TODO: Implement OpenAPI export
+                console.log('📄 OpenAPI export not yet implemented')
+            }
+        } catch (error) {
+            console.error('❌ Enhanced analysis failed:', error)
+            process.exit(1)
+        }
+    })
+
+program
     .command('info')
     .description(
         'Get information about controllers and services without detailed output'
