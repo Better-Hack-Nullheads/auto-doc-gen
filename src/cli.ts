@@ -4,6 +4,7 @@ import { Command } from 'commander'
 import * as fs from 'fs'
 import * as pathModule from 'path'
 import { AutoDocGen } from './core/analyzer'
+import { EnhancedJsonExporter } from './exporters/enhanced-json-exporter'
 import { SimpleOptions } from './types/common.types'
 import { JsonOutputOptions } from './types/json-output.types'
 
@@ -242,8 +243,28 @@ program
             console.log(`✅ Enhanced analysis exported to: ${outputPath}`)
 
             if (options.openapi) {
-                // TODO: Implement OpenAPI export
-                console.log('📄 OpenAPI export not yet implemented')
+                // Generate OpenAPI spec from the enhanced analysis
+                const enhancedExporter = new EnhancedJsonExporter({
+                    outputPath: options.output,
+                    format: options.format,
+                })
+
+                // Read the enhanced analysis file and generate OpenAPI
+                const analysisPath =
+                    options.output || './docs/enhanced-analysis.json'
+                if (fs.existsSync(analysisPath)) {
+                    const analysisData = JSON.parse(
+                        fs.readFileSync(analysisPath, 'utf8')
+                    )
+                    const openapiPath = await enhancedExporter.exportAsOpenAPI(
+                        analysisData.apiEndpoints
+                    )
+                    console.log(`📄 OpenAPI spec exported to: ${openapiPath}`)
+                } else {
+                    console.log(
+                        '❌ Enhanced analysis file not found. Run enhanced analysis first.'
+                    )
+                }
             }
         } catch (error) {
             console.error('❌ Enhanced analysis failed:', error)

@@ -1,0 +1,854 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Documentation",
+    "version": "1.0.0",
+    "description": "Auto-generated API documentation"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Handle GET endpoint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Primitive type: string"
+                },
+                "examples": {
+                  "example-200": {
+                    "value": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Primitive type: string"
+                },
+                "examples": {
+                  "example-404": {
+                    "value": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/analyze": {
+      "get": {
+        "summary": "Handle GET endpoint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Primitive type: any"
+                },
+                "examples": {
+                  "example-200": {
+                    "value": {}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Primitive type: any"
+                },
+                "examples": {
+                  "example-404": {
+                    "value": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/analysis-results": {
+      "get": {
+        "summary": "Handle GET endpoint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Primitive type: any"
+                },
+                "examples": {
+                  "example-200": {
+                    "value": {}
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "description": "Primitive type: any"
+                },
+                "examples": {
+                  "example-404": {
+                    "value": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/products": {
+      "post": {
+        "summary": "Create POST endpoint",
+        "parameters": [
+          {
+            "name": "createProductDto",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "optional": false
+                },
+                "description": {
+                  "type": "string",
+                  "optional": true
+                },
+                "price": {
+                  "type": "number",
+                  "optional": false
+                },
+                "category": {
+                  "type": "string",
+                  "optional": false
+                }
+              },
+              "required": [
+                "name",
+                "price",
+                "category"
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "optional": false
+                  },
+                  "description": {
+                    "type": "string",
+                    "optional": true
+                  },
+                  "price": {
+                    "type": "number",
+                    "optional": false
+                  },
+                  "category": {
+                    "type": "string",
+                    "optional": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "price",
+                  "category"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "name": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "description": {
+                      "type": "string",
+                      "optional": true
+                    },
+                    "price": {
+                      "type": "number",
+                      "optional": false
+                    },
+                    "category": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "category",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                },
+                "examples": {
+                  "example-201": {
+                    "value": {
+                      "id": "string",
+                      "name": "string",
+                      "price": 0,
+                      "category": "string",
+                      "createdAt": "2025-10-04T17:34:21.578Z",
+                      "updatedAt": "2025-10-04T17:34:21.579Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "name": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "description": {
+                      "type": "string",
+                      "optional": true
+                    },
+                    "price": {
+                      "type": "number",
+                      "optional": false
+                    },
+                    "category": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "category",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                },
+                "examples": {
+                  "example-400": {
+                    "value": {
+                      "id": "string",
+                      "name": "string",
+                      "price": 0,
+                      "category": "string",
+                      "createdAt": "2025-10-04T17:34:21.578Z",
+                      "updatedAt": "2025-10-04T17:34:21.579Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      },
+      "get": {
+        "summary": "Handle GET endpoint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array of Product",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "optional": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "optional": false
+                      },
+                      "description": {
+                        "type": "string",
+                        "optional": true
+                      },
+                      "price": {
+                        "type": "number",
+                        "optional": false
+                      },
+                      "category": {
+                        "type": "string",
+                        "optional": false
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "optional": false
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "optional": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "price",
+                      "category",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "examples": {
+                  "example-200": {
+                    "value": [
+                      {
+                        "id": "string",
+                        "name": "string",
+                        "price": 0,
+                        "category": "string",
+                        "createdAt": "2025-10-04T17:34:21.579Z",
+                        "updatedAt": "2025-10-04T17:34:21.579Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array of Product",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "optional": false
+                      },
+                      "name": {
+                        "type": "string",
+                        "optional": false
+                      },
+                      "description": {
+                        "type": "string",
+                        "optional": true
+                      },
+                      "price": {
+                        "type": "number",
+                        "optional": false
+                      },
+                      "category": {
+                        "type": "string",
+                        "optional": false
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "optional": false
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "optional": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "price",
+                      "category",
+                      "createdAt",
+                      "updatedAt"
+                    ]
+                  }
+                },
+                "examples": {
+                  "example-404": {
+                    "value": [
+                      {
+                        "id": "string",
+                        "name": "string",
+                        "price": 0,
+                        "category": "string",
+                        "createdAt": "2025-10-04T17:34:21.579Z",
+                        "updatedAt": "2025-10-04T17:34:21.579Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    },
+    "/products/:id": {
+      "get": {
+        "summary": "Handle GET endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Primitive type: string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "name": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "description": {
+                      "type": "string",
+                      "optional": true
+                    },
+                    "price": {
+                      "type": "number",
+                      "optional": false
+                    },
+                    "category": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "category",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                },
+                "examples": {
+                  "example-200": {
+                    "value": {
+                      "id": "string",
+                      "name": "string",
+                      "price": 0,
+                      "category": "string",
+                      "createdAt": "2025-10-04T17:34:21.579Z",
+                      "updatedAt": "2025-10-04T17:34:21.579Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "name": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "description": {
+                      "type": "string",
+                      "optional": true
+                    },
+                    "price": {
+                      "type": "number",
+                      "optional": false
+                    },
+                    "category": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "category",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                },
+                "examples": {
+                  "example-404": {
+                    "value": {
+                      "id": "string",
+                      "name": "string",
+                      "price": 0,
+                      "category": "string",
+                      "createdAt": "2025-10-04T17:34:21.579Z",
+                      "updatedAt": "2025-10-04T17:34:21.579Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      },
+      "patch": {
+        "summary": "Update PATCH endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Primitive type: string"
+            }
+          },
+          {
+            "name": "updateProductDto",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {},
+              "required": []
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "name": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "description": {
+                      "type": "string",
+                      "optional": true
+                    },
+                    "price": {
+                      "type": "number",
+                      "optional": false
+                    },
+                    "category": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "category",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                },
+                "examples": {
+                  "example-200": {
+                    "value": {
+                      "id": "string",
+                      "name": "string",
+                      "price": 0,
+                      "category": "string",
+                      "createdAt": "2025-10-04T17:34:21.580Z",
+                      "updatedAt": "2025-10-04T17:34:21.580Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "name": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "description": {
+                      "type": "string",
+                      "optional": true
+                    },
+                    "price": {
+                      "type": "number",
+                      "optional": false
+                    },
+                    "category": {
+                      "type": "string",
+                      "optional": false
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "optional": false
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "category",
+                    "createdAt",
+                    "updatedAt"
+                  ]
+                },
+                "examples": {
+                  "example-404": {
+                    "value": {
+                      "id": "string",
+                      "name": "string",
+                      "price": 0,
+                      "category": "string",
+                      "createdAt": "2025-10-04T17:34:21.580Z",
+                      "updatedAt": "2025-10-04T17:34:21.580Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      },
+      "delete": {
+        "summary": "Delete DELETE endpoint",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Primitive type: string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Unknown type: { message: string }"
+                },
+                "examples": {
+                  "example-200": {
+                    "value": "string"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "description": "Unknown type: { message: string }"
+                },
+                "examples": {
+                  "example-404": {
+                    "value": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Products"
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {}
+  }
+}

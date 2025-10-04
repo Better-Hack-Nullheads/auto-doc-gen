@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generatedAt": "2025-10-04T17:31:20.274Z",
+    "generatedAt": "2025-10-04T17:34:26.471Z",
     "version": "2.0.0",
     "projectPath": "../backend/src",
-    "analysisTime": 4.527,
+    "analysisTime": 4.984,
     "totalFiles": 10,
     "totalControllers": 2,
     "totalServices": 0,
@@ -133,11 +133,12 @@
     {
       "name": "ProductsController",
       "filePath": "C:/Users/LENOVO/Desktop/Better-hack/backend/src/products/products.controller.ts",
+      "basePath": "products",
       "endpoints": [
         {
           "method": "POST",
           "path": "",
-          "fullPath": "/",
+          "fullPath": "/products",
           "summary": "Create POST endpoint",
           "requestSchema": {
             "type": "object",
@@ -256,8 +257,8 @@
                 "name": "string",
                 "price": 0,
                 "category": "string",
-                "createdAt": "2025-10-04T17:31:15.847Z",
-                "updatedAt": "2025-10-04T17:31:15.847Z"
+                "createdAt": "2025-10-04T17:34:21.578Z",
+                "updatedAt": "2025-10-04T17:34:21.579Z"
               }
             }
           ],
@@ -275,7 +276,7 @@
         {
           "method": "GET",
           "path": "",
-          "fullPath": "/",
+          "fullPath": "/products",
           "summary": "Handle GET endpoint",
           "responseSchema": {
             "type": "array",
@@ -334,8 +335,8 @@
                   "name": "string",
                   "price": 0,
                   "category": "string",
-                  "createdAt": "2025-10-04T17:31:15.848Z",
-                  "updatedAt": "2025-10-04T17:31:15.848Z"
+                  "createdAt": "2025-10-04T17:34:21.579Z",
+                  "updatedAt": "2025-10-04T17:34:21.579Z"
                 }
               ]
             }
@@ -354,7 +355,7 @@
         {
           "method": "GET",
           "path": ":id",
-          "fullPath": "/:id",
+          "fullPath": "/products/:id",
           "summary": "Handle GET endpoint",
           "responseSchema": {
             "type": "object",
@@ -420,8 +421,8 @@
                 "name": "string",
                 "price": 0,
                 "category": "string",
-                "createdAt": "2025-10-04T17:31:15.848Z",
-                "updatedAt": "2025-10-04T17:31:15.848Z"
+                "createdAt": "2025-10-04T17:34:21.579Z",
+                "updatedAt": "2025-10-04T17:34:21.579Z"
               }
             }
           ],
@@ -439,7 +440,7 @@
         {
           "method": "PATCH",
           "path": ":id",
-          "fullPath": "/:id",
+          "fullPath": "/products/:id",
           "summary": "Update PATCH endpoint",
           "requestSchema": {
             "type": "object",
@@ -523,8 +524,8 @@
                 "name": "string",
                 "price": 0,
                 "category": "string",
-                "createdAt": "2025-10-04T17:31:15.849Z",
-                "updatedAt": "2025-10-04T17:31:15.849Z"
+                "createdAt": "2025-10-04T17:34:21.580Z",
+                "updatedAt": "2025-10-04T17:34:21.580Z"
               }
             }
           ],
@@ -542,7 +543,7 @@
         {
           "method": "DELETE",
           "path": ":id",
-          "fullPath": "/:id",
+          "fullPath": "/products/:id",
           "summary": "Delete DELETE endpoint",
           "responseSchema": {
             "type": "string",
@@ -924,6 +925,6 @@
     "totalTypes": 9,
     "totalDtos": 8,
     "totalInterfaces": 1,
-    "analysisTime": 4.527
+    "analysisTime": 4.984
   }
 }
