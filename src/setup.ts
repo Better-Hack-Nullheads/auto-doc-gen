@@ -64,15 +64,68 @@ function setupAutoDocGen() {
                 JSON.stringify(packageJson, null, 2) + '\n'
             )
             console.log(`✅ Added ${addedScripts} docs scripts to package.json`)
-            console.log('📋 Available commands:')
-            console.log('   npm run docs        - Generate JSON documentation')
-            console.log('   npm run docs:analyze - Show analysis in console')
-            console.log('   npm run docs:info   - Quick summary')
-            console.log('   npm run docs:export - Export to JSON file')
-            console.log('   npm run docs:all    - Export multiple formats')
         } else {
             console.log('✅ AutoDocGen scripts already exist in package.json')
         }
+
+        // Create configuration file if it doesn't exist
+        const configPath = path.join(path.dirname(packageJsonPath), 'autodocgen.config.json')
+        if (!fs.existsSync(configPath)) {
+            const defaultConfig = {
+                sourcePath: './src',
+                output: {
+                    json: {
+                        enabled: true,
+                        pretty: true,
+                        compact: true,
+                        outputDir: './docs',
+                        filename: 'api-documentation.json',
+                        includeMetadata: true,
+                        timestamp: true
+                    },
+                    console: {
+                        enabled: true,
+                        verbose: false,
+                        colorOutput: true
+                    }
+                },
+                analysis: {
+                    includeInterfaces: true,
+                    includeClasses: true,
+                    includeEnums: true,
+                    includeValidationRules: true,
+                    includeDecorators: true,
+                    includeImports: true,
+                    maxDepth: 5
+                },
+                include: [
+                    '**/*.controller.ts',
+                    '**/*.service.ts',
+                    '**/*.dto.ts',
+                    '**/*.interface.ts',
+                    '**/*.enum.ts'
+                ],
+                exclude: [
+                    '**/*.spec.ts',
+                    '**/*.test.ts',
+                    '**/node_modules/**',
+                    '**/dist/**'
+                ]
+            }
+
+            fs.writeFileSync(configPath, JSON.stringify(defaultConfig, null, 2) + '\n')
+            console.log('✅ Created autodocgen.config.json for easy customization')
+        } else {
+            console.log('✅ Configuration file already exists: autodocgen.config.json')
+        }
+
+        console.log('📋 Available commands:')
+        console.log('   npm run docs        - Generate JSON documentation')
+        console.log('   npm run docs:analyze - Show analysis in console')
+        console.log('   npm run docs:info   - Quick summary')
+        console.log('   npm run docs:export - Export to JSON file')
+        console.log('   npm run docs:all    - Export multiple formats')
+        console.log('📄 Configuration: Edit autodocgen.config.json to customize output')
 
         console.log('🎉 AutoDocGen setup complete!')
     } catch (error) {
