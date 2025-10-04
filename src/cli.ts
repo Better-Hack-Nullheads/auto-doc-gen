@@ -14,6 +14,20 @@ import { JsonOutputOptions } from './types/json-output.types'
 const program = new Command()
 
 /**
+ * Extract database name from MongoDB connection string
+ */
+function extractDatabaseName(connectionString: string): string {
+    try {
+        const url = new URL(connectionString)
+        const pathname = url.pathname
+        return pathname.startsWith('/') ? pathname.slice(1) : pathname || 'api_docs'
+    } catch {
+        // Fallback for malformed URLs
+        return 'api_docs'
+    }
+}
+
+/**
  * Read configuration from file
  */
 function readConfig(configPath: string): any {
@@ -230,9 +244,9 @@ program
         'json-pretty'
     )
     .option('--openapi', 'Also generate OpenAPI specification', false)
-    .option('--database', 'Save analysis to database', false)
+    .option('--database', 'Save analysis to database (requires --db-url or config file)', false)
     .option('--db-type <type>', 'Database type: mongodb', 'mongodb')
-    .option('--db-url <url>', 'Database connection URL')
+    .option('--db-url <url>', 'Database connection URL (required for --database)')
     .option('-v, --verbose', 'Show verbose output', false)
     .action(async (path: string, options: any) => {
         try {
@@ -255,16 +269,50 @@ program
                     let dbConfig = DatabaseConfigLoader.loadFromFile(
                         'autodocgen.config.json'
                     )
-                    if (!dbConfig) {
-                        dbConfig = DatabaseConfigLoader.createDefaultConfig()
+                    
+                    // Check if we have a valid config or CLI URL
+                    if (!dbConfig && !options.dbUrl) {
+                        console.error('❌ Database URL required!')
+                        console.log('💡 Options:')
+                        console.log('   1. Add database config to autodocgen.config.json')
+                        console.log('   2. Use --db-url option: --db-url "mongodb://localhost:27017/your_db"')
+                        process.exit(1)
                     }
 
-                    // Override with CLI options
-                    if (options.dbUrl) {
-                        dbConfig.connectionString = options.dbUrl
-                    }
-                    if (options.dbType) {
-                        dbConfig.type = options.dbType as any
+                    // Create config from CLI options if no config file
+                    if (!dbConfig) {
+                        if (!options.dbUrl) {
+                            console.error('❌ Database URL required!')
+                            console.log('💡 Use --db-url option: --db-url "mongodb://localhost:27017/your_db"')
+                            process.exit(1)
+                        }
+                        
+                        // Create minimal config from CLI options
+                        dbConfig = {
+                            type: options.dbType || 'mongodb',
+                            connectionString: options.dbUrl,
+                            database: extractDatabaseName(options.dbUrl),
+                            mapping: {
+                                enabled: true,
+                                createCollections: true,
+                                includeTypeSchemas: true,
+                                includeValidationRules: true,
+                            },
+                            collections: {
+                                documentation: 'documentation',
+                                endpoints: 'endpoints',
+                                types: 'type_schemas',
+                            },
+                        }
+                    } else {
+                        // Override config file with CLI options
+                        if (options.dbUrl) {
+                            dbConfig.connectionString = options.dbUrl
+                            dbConfig.database = extractDatabaseName(options.dbUrl)
+                        }
+                        if (options.dbType) {
+                            dbConfig.type = options.dbType as any
+                        }
                     }
 
                     // Connect to database and save

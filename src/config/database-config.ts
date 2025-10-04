@@ -16,23 +16,9 @@ export class DatabaseConfigLoader {
         }
     }
 
-    static createDefaultConfig(): DatabaseConfig {
-        return {
-            type: 'mongodb',
-            connectionString: 'mongodb://localhost:27017/api_docs',
-            database: 'api_docs',
-            mapping: {
-                enabled: true,
-                createCollections: true,
-                includeTypeSchemas: true,
-                includeValidationRules: true,
-            },
-            collections: {
-                documentation: 'documentation',
-                endpoints: 'endpoints',
-                types: 'type_schemas',
-            },
-        }
+    static createDefaultConfig(): DatabaseConfig | null {
+        // No default config - user must provide database URL
+        return null
     }
 
     private static validateConfig(config: any): DatabaseConfig | null {

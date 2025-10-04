@@ -14,14 +14,14 @@
 ### 2. Generate Analysis with Database Storage
 
 ```bash
-# Basic usage - saves to MongoDB
-autodocgen enhanced ../backend/src --database
-
-# With custom database URL
+# REQUIRED: Database URL must be provided
 autodocgen enhanced ../backend/src --database --db-url "mongodb://localhost:27017/my_api_docs"
 
 # With custom database type (currently only MongoDB supported)
-autodocgen enhanced ../backend/src --database --db-type mongodb
+autodocgen enhanced ../backend/src --database --db-url "mongodb://localhost:27017/my_api_docs" --db-type mongodb
+
+# Using configuration file (database config must be in autodocgen.config.json)
+autodocgen enhanced ../backend/src --database
 ```
 
 ### 3. Configuration File
@@ -115,12 +115,25 @@ Create or update `autodocgen.config.json`:
 ### Basic Analysis with Database
 
 ```bash
-# Analyze backend and save to database
-autodocgen enhanced ../backend/src --database
+# Analyze backend and save to database (REQUIRES database URL)
+autodocgen enhanced ../backend/src --database --db-url "mongodb://localhost:27017/my_docs"
 
 # Output:
 # ✅ Enhanced analysis exported to: ./docs/enhanced-analysis.json
 # ✅ Analysis saved to database
+```
+
+### Error Handling
+```bash
+# This will show an error if no database URL is provided
+autodocgen enhanced ../backend/src --database
+
+# Output:
+# ✅ Enhanced analysis exported to: ./docs/enhanced-analysis.json
+# ❌ Database URL required!
+# 💡 Options:
+#    1. Add database config to autodocgen.config.json
+#    2. Use --db-url option: --db-url "mongodb://localhost:27017/your_db"
 ```
 
 ### Custom Database Configuration

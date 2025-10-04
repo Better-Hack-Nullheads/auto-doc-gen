@@ -16,22 +16,6 @@
             "colorOutput": true
         }
     },
-    "database": {
-        "type": "mongodb",
-        "connectionString": "mongodb://localhost:27017/api_docs",
-        "database": "api_docs",
-        "mapping": {
-            "enabled": true,
-            "createCollections": true,
-            "includeTypeSchemas": true,
-            "includeValidationRules": true
-        },
-        "collections": {
-            "documentation": "documentation",
-            "endpoints": "endpoints",
-            "types": "type_schemas"
-        }
-    },
     "analysis": {
         "includeInterfaces": true,
         "includeClasses": true,
