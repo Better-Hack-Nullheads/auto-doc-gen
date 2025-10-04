@@ -29,6 +29,8 @@
         "ts-morph": "^21.0.1"
     },
     "devDependencies": {
+        "@nestjs/common": "^11.1.6",
+        "@nestjs/core": "^11.1.6",
         "@types/jest": "^29.0.0",
         "@types/node": "^20.19.19",
         "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -39,5 +41,17 @@
     },
     "engines": {
         "node": ">=16.0.0"
+    },
+    "peerDependencies": {
+        "@nestjs/common": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
+        "@nestjs/core": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
+    },
+    "peerDependenciesMeta": {
+        "@nestjs/common": {
+            "optional": true
+        },
+        "@nestjs/core": {
+            "optional": true
+        }
     }
 }
