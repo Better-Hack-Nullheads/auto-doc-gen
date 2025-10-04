@@ -253,3 +253,4 @@ export AUTODOCGEN_DB_URL="mongodb://admin:password@host:27017/db"
 ## Summary
 
 Environment variables provide a secure and flexible way to configure AutoDocGen across different environments. They follow the standard 12-factor app methodology and integrate well with modern deployment practices.
+
