@@ -246,6 +246,69 @@ program
             console.log('🧠 Processing with AI...')
             const aiAnalysis = await aiService.analyzeProject(analysisData)
 
+            // Save to database first (before saving to file)
+            try {
+                const dbUrl = config.database.url
+                if (dbUrl) {
+                    console.log('💾 Saving to database...')
+
+                    const dbConfig = {
+                        type: config.database.type,
+                        connectionString: dbUrl,
+                        database: ConfigLoader.extractDatabaseName(dbUrl),
+                        mapping: {
+                            enabled: true,
+                            createCollections: true,
+                            includeTypeSchemas: true,
+                            includeValidationRules: true,
+                        },
+                        collections: {
+                            documentation: 'documentation',
+                            endpoints: 'endpoints',
+                            types: 'types',
+                        },
+                    }
+
+                    const dbAdapter = new MongoDBAdapter(dbConfig)
+                    await dbAdapter.connect()
+
+                    // Save the AI-generated documentation content
+                    const docData = {
+                        content: aiAnalysis,
+                        source: jsonFile,
+                        provider: provider,
+                        model: model,
+                        timestamp: new Date().toISOString(),
+                        metadata: {
+                            totalControllers:
+                                analysisData.metadata?.totalControllers || 0,
+                            totalServices:
+                                analysisData.metadata?.totalServices || 0,
+                            totalTypes: analysisData.metadata?.totalTypes || 0,
+                            totalMethods:
+                                analysisData.metadata?.totalMethods || 0,
+                            analysisTime:
+                                analysisData.metadata?.analysisTime || 0,
+                            generatedAt:
+                                analysisData.metadata?.generatedAt ||
+                                new Date().toISOString(),
+                        },
+                    }
+
+                    await dbAdapter.saveDocumentation(docData)
+                    await dbAdapter.disconnect()
+
+                    console.log('✅ Saved to database successfully!')
+                } else {
+                    console.log(
+                        '⚠️  No database URL configured - skipping database save'
+                    )
+                }
+            } catch (dbError) {
+                console.error('❌ Database save failed:', dbError)
+                console.log('📄 Continuing with file save...')
+            }
+
             // Output results
             const outputPath =
                 options.output || `${config.ai.outputDir}/ai-analysis.md`
@@ -259,7 +322,7 @@ program
                 `📝 Generated ${aiAnalysis.length} characters of analysis`
             )
 
-            // Save to database if requested
+            // Legacy database save (kept for backward compatibility)
             if (options.saveToDb) {
                 try {
                     const dbUrl = config.database.url
@@ -292,7 +355,6 @@ program
 
                     const adapter = new MongoDBAdapter(dbConfig)
                     await adapter.connect()
-                    await adapter.createCollections()
 
                     // Save the MD content to database
                     const docData = {
