@@ -1,16 +1,47 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander'
+import * as fs from 'fs'
+import * as pathModule from 'path'
 import { AutoDocGen } from './core/analyzer'
 import { SimpleOptions } from './types/common.types'
 import { JsonOutputOptions } from './types/json-output.types'
 
 const program = new Command()
 
+/**
+ * Read configuration from file
+ */
+function readConfig(configPath: string): any {
+    try {
+        if (fs.existsSync(configPath)) {
+            const configContent = fs.readFileSync(configPath, 'utf8')
+            return JSON.parse(configContent)
+        }
+    } catch (error) {
+        console.log(`⚠️  Could not read config file: ${configPath}`)
+    }
+    return null
+}
+
 program
     .name('auto-doc-gen')
     .description('Simple NestJS controller and service analyzer')
     .version('1.0.0')
+
+program
+    .command('setup')
+    .description('Setup AutoDocGen scripts and configuration')
+    .action(() => {
+        try {
+            // Import and run the setup function
+            const setupPath = pathModule.join(__dirname, 'setup.js')
+            require(setupPath)
+        } catch (error) {
+            console.error('❌ Setup failed:', (error as Error).message)
+            process.exit(1)
+        }
+    })
 
 program
     .command('analyze')
@@ -75,19 +106,48 @@ program
     .option('--group-by <type>', 'Group by: file, type, module', 'none')
     .option('--timestamp', 'Include timestamp in output', true)
     .option('-v, --verbose', 'Show verbose output', false)
+    .option(
+        '-c, --config <path>',
+        'Use configuration file',
+        'autodocgen.config.json'
+    )
     .action(async (path: string, options: any) => {
         try {
+            // Read config file if specified
+            let config = null
+            if (options.config) {
+                config = readConfig(options.config)
+            }
+
             const analyzer = new AutoDocGen({
-                verbose: options.verbose,
-                colorOutput: true,
+                verbose:
+                    options.verbose ||
+                    config?.output?.console?.verbose ||
+                    false,
+                colorOutput: config?.output?.console?.colorOutput ?? true,
             })
 
+            // Use config values if available, otherwise use command line options
             const jsonOptions: JsonOutputOptions = {
-                outputPath: options.output,
-                format: options.format,
-                includeMetadata: !options.noMetadata,
-                groupBy: options.groupBy,
-                timestamp: options.timestamp,
+                outputPath:
+                    options.output ||
+                    (config?.output?.json
+                        ? pathModule.join(
+                              config.output.json.outputDir || './docs',
+                              config.output.json.filename || 'analysis.json'
+                          )
+                        : './docs/analysis.json'),
+                format:
+                    options.format ||
+                    (config?.output?.json?.pretty ? 'json-pretty' : 'json'),
+                includeMetadata: options.noMetadata
+                    ? false
+                    : config?.output?.json?.includeMetadata ?? true,
+                groupBy: options.groupBy || 'none',
+                timestamp:
+                    options.timestamp ??
+                    config?.output?.json?.timestamp ??
+                    true,
             }
 
             const outputPath = await analyzer.exportToJson(path, jsonOptions)

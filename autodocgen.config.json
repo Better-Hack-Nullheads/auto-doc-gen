@@ -1,0 +1,41 @@
+{
+  "sourcePath": "./src",
+  "output": {
+    "json": {
+      "enabled": true,
+      "pretty": true,
+      "compact": true,
+      "outputDir": "./docs",
+      "filename": "api-documentation.json",
+      "includeMetadata": true,
+      "timestamp": true
+    },
+    "console": {
+      "enabled": true,
+      "verbose": false,
+      "colorOutput": true
+    }
+  },
+  "analysis": {
+    "includeInterfaces": true,
+    "includeClasses": true,
+    "includeEnums": true,
+    "includeValidationRules": true,
+    "includeDecorators": true,
+    "includeImports": true,
+    "maxDepth": 5
+  },
+  "include": [
+    "**/*.controller.ts",
+    "**/*.service.ts",
+    "**/*.dto.ts",
+    "**/*.interface.ts",
+    "**/*.enum.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/node_modules/**",
+    "**/dist/**"
+  ]
+}
