@@ -95,6 +95,13 @@ function setupAutoDocGen() {
             'autodocgen.config.json'
         )
         if (!fs.existsSync(configPath)) {
+            // Generate database name from project name
+            const projectName = packageJson.name || 'api_docs'
+            const cleanProjectName = projectName
+                .replace(/[^a-zA-Z0-9]/g, '_')
+                .toLowerCase()
+            const databaseName = `${cleanProjectName}_docs`
+
             const defaultConfig = {
                 sourcePath: './src',
                 output: {
@@ -111,6 +118,22 @@ function setupAutoDocGen() {
                         enabled: true,
                         verbose: false,
                         colorOutput: true,
+                    },
+                },
+                database: {
+                    type: 'mongodb',
+                    connectionString: `mongodb://localhost:27017/${databaseName}`,
+                    database: databaseName,
+                    mapping: {
+                        enabled: true,
+                        createCollections: true,
+                        includeTypeSchemas: true,
+                        includeValidationRules: true,
+                    },
+                    collections: {
+                        documentation: 'documentation',
+                        endpoints: 'endpoints',
+                        types: 'type_schemas',
                     },
                 },
                 analysis: {
@@ -143,7 +166,7 @@ function setupAutoDocGen() {
                     JSON.stringify(defaultConfig, null, 2) + '\n'
                 )
                 console.log(
-                    '✅ Created autodocgen.config.json with NestJS defaults'
+                    `✅ Created autodocgen.config.json with database config (${databaseName})`
                 )
             } catch (error) {
                 console.log(
