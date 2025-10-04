@@ -3,7 +3,7 @@ import { JsonAnalysisResult } from '../exporters/json-exporter'
 export class PromptTemplates {
     static getDefaultTemplate(): string {
         return `
-        Analyze this NestJS project and provide a concise but comprehensive overview.
+        Generate comprehensive technical documentation for this NestJS project.
         
         Project: {{totalControllers}} controllers, {{totalServices}} services, {{totalTypes}} types
         
@@ -11,14 +11,34 @@ export class PromptTemplates {
         Services: {{services}}
         Data Models: {{types}}
         
-        Provide:
-        1. Brief project overview
-        2. Key controllers and endpoints
-        3. Main services and their purpose
-        4. Important data models
-        5. Top 3 recommendations
+        Create structured documentation in **Markdown format** with:
         
-        Keep it concise but informative. Focus on the most important aspects.
+        ## 1. Project Overview
+        - Architecture summary
+        - Technology stack
+        - Module structure
+        
+        ## 2. API Endpoints
+        For each controller, list:
+        - HTTP Method and Path
+        - Parameters (name, type, required)
+        - Return Type
+        - Description
+        
+        ## 3. Services
+        - Business logic summary
+        - Key methods and their purpose
+        - Dependencies
+        
+        ## 4. Data Models
+        - Properties and types
+        - Validation rules
+        - Relationships
+        
+        ## 5. Recommendations
+        - Top 3 improvement suggestions
+        
+        **Important:** Format the response as proper Markdown with headers, tables, code blocks, and bullet points. Use markdown syntax for better readability.
         `
     }
 
